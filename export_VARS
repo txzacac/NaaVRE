@@ -1,0 +1,12 @@
+export NAAVRE_API_TOKEN=TOKEN
+export JUPYTERHUB_USER=dev.user.name@domain.com
+export API_ENDPOINT=http://localhost:8000
+export VLAB_SLUG=laserfarm
+export MODULE_MAPPING_URL=https://raw.githubusercontent.com/QCDIS/NaaVRE-conf/main/module_mapping.json
+export SEARCH_API_ENDPOINT=http://HOST/api/
+export SEARCH_API_TOKEN=TOKEN
+export CELL_GITHUB=https://github.com/ORG/NAME
+export CELL_GITHUB_TOKEN=TOKEN
+export ARGO_WF_SPEC_SERVICEACCOUNT="executor"
+export JUPYTERHUB_SINGLEUSER_APP="jupyter_server.serverapp.ServerApp"
+export REGISTRY_URL=
