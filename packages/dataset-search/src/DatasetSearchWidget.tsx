@@ -22,7 +22,7 @@ async function activate (
     labShell: LabShell,
     restorer: ILayoutRestorer,
 ): Promise<ILifeWatchVRE> {
-    
+
     let widget: ReactWidget;
 
     lab.started.then(() => {
@@ -43,6 +43,8 @@ async function activate (
             labShell.add(widget, 'left');
         }
     });
-
+    alert('DatasetSearchWidget');
+    console.log('DatasetSearchWidget');
+    
     return { widget };
 }

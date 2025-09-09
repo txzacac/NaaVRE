@@ -31,6 +31,8 @@ build-frontend: jlpm-install
 	npx lerna run build --scope @jupyter_vre/experiment-manager
 	npx lerna run build --scope @jupyter_vre/vre-panel
 	npx lerna run build --scope @jupyter_vre/vre-menu
+	npx lerna run build --scope @jupyter_vre/collab-manager
+
 
 
 build-p: jlpm-install
@@ -65,6 +67,7 @@ install-ui:
 	$(call INSTALL_LAB_EXTENSION,experiment-manager)
 	$(call INSTALL_LAB_EXTENSION,vre-panel)
 	$(call INSTALL_LAB_EXTENSION,vre-menu)
+	$(call INSTALL_LAB_EXTENSION,collab-manager)
 
 link-ui:
 	$(call LINK_LAB_EXTENSION,notebook-search)
@@ -76,6 +79,7 @@ link-ui:
 	$(call LINK_LAB_EXTENSION,experiment-manager)
 	$(call LINK_LAB_EXTENSION,vre-panel)
 	$(call LINK_LAB_EXTENSION,vre-menu)
+	$(call LINK_LAB_EXTENSION,collab-manager)
 
 dist-ui: build-frontend
 	mkdir -p dist
@@ -88,6 +92,7 @@ dist-ui: build-frontend
 	$(call PACKAGE_LAB_EXTENSION,notebook-search)
 	$(call PACKAGE_LAB_EXTENSION,type-detector)
 	$(call PACKAGE_LAB_EXTENSION,dataset-search)
+	$(call PACKAGE_LAB_EXTENSION,collab-manager)
 
 release: dist-ui build-backend
 	
