@@ -19,7 +19,7 @@ export default function NotebookDownloadDialogue({ data, query }: NotebookDownlo
   const [loading, setLoading] = React.useState(false);
   const [success, setSuccess] = React.useState(false);
   const [downloaded_notebook_path, setDownloadedNotebookPath] = React.useState('');
-  const timer = React.useRef<number>();
+  const timer = React.useRef<number | undefined>(undefined);
 
   const buttonSx = {
     ...(success && {

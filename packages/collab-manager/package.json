@@ -33,8 +33,11 @@
     },
     "dependencies": {
         "react-ipynb-renderer": "2.0.1",
-        "ts-node": "10.9.2"
-
+        "ts-node": "10.9.2",
+        "@jupyterlab/launcher": "^3.5.3",
+        "@jupyterlab/docregistry": "^3.5.3",
+        "@jupyterlab/docmanager": "^3.5.3",
+        "@jupyterlab/filebrowser": "^3.5.3"
     },
     "devDependencies": {
         "@types/node": "20.2.5",

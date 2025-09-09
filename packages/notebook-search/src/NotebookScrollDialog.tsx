@@ -42,7 +42,7 @@ function TabPanel(props: TabPanelProps) {
     >
       {value === index && (
         <Box sx={{ p: 3 }}>
-          <Typography>{children}</Typography>
+          <Typography>{children as any}</Typography>
         </Box>
       )}
     </div>
