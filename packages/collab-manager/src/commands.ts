@@ -1,7 +1,8 @@
-import { CommandRegistry } from '@lumino/commands';
 // import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
 import { LabIcon } from '@jupyterlab/ui-components';
 import { CollabManagerWidget } from './widget';
+// @ts-ignore
+import { JupyterFrontEnd } from '@jupyterlab/application';
 
 // Create a simple icon for the launcher
 const collabIcon = new LabIcon({
@@ -17,23 +18,19 @@ export namespace CommandIDs {
 // functions of the app : 1. defined an icon , 2 defined content of the widget
 export namespace Commands {
   export function addCommands(
-    commands: CommandRegistry
+    app: JupyterFrontEnd
   ) {
-    commands.addCommand(CommandIDs.createNew, {
+    app.commands.addCommand(CommandIDs.createNew, {
       label: 'Collaboration Manager',
       caption: 'Open Collaboration Manager',
       icon: args => (args['isPalette'] ? null : collabIcon),
       execute: () => {
         // Create a new widget, which has a content in the constructor
-        const widget = new CollabManagerWidget();
+        const widget = new CollabManagerWidget(app);
         
         // Add it to the main area(where to show)
-        const app = commands as any;
-        if (app.shell) {
-          app.shell.add(widget, 'main');
-          alert('add widget to main');
-          app.shell.activateById(widget.id);
-        }
+        app.shell.add(widget, 'main');
+        app.shell.activateById(widget.id);
         
         return widget;
       }

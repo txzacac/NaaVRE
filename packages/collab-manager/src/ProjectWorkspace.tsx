@@ -5,16 +5,17 @@ import { ProjectConfig, PHASES } from './types';
 interface ProjectWorkspaceProps {
   project: ProjectConfig;
   onBack: () => void;
+  onModuleClick: (moduleId: string) => void;
 }
 
-export const ProjectWorkspace: React.FC<ProjectWorkspaceProps> = ({ project, onBack }) => {
+export const ProjectWorkspace: React.FC<ProjectWorkspaceProps> = ({ project, onBack, onModuleClick }) => {
   const getPhaseModules = (phaseId: string) => {
     const phase = PHASES.find(p => p.id === phaseId);
     return phase ? phase.modules.filter(m => project.modules.includes(m.id)) : [];
   };
 
   const handleModuleClick = (moduleId: string) => {
-    alert(`Module "${moduleId}" is under construction. This feature will be available soon!`);
+    onModuleClick(moduleId);
   };
 
   return (

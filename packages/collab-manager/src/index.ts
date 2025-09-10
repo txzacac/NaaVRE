@@ -34,7 +34,7 @@ import { Commands, CommandIDs } from './commands';
       alert('JupyterLab extension collab-manager is activated!2');
       
       // invoke the addcommand to show widget in main area with content 
-      Commands.addCommands(app.commands); 
+      Commands.addCommands(app); 
       
       // Add to launcher
       if (launcher) {

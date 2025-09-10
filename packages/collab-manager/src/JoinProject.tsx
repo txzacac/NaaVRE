@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 
 interface JoinProjectProps {
   onBack: () => void;
-  onProjectJoined: (projectId: string) => void;
+  onProjectJoined: (project: any) => void;
 }
 
 export const JoinProject: React.FC<JoinProjectProps> = ({ onBack, onProjectJoined }) => {
@@ -40,7 +40,7 @@ export const JoinProject: React.FC<JoinProjectProps> = ({ onBack, onProjectJoine
       
       if (result.success) {
         alert(`Successfully joined project: ${result.project.name}`);
-        onProjectJoined(projectId);
+        onProjectJoined(result.project);
       } else {
         alert(`Failed to join project: ${result.error}`);
       }
