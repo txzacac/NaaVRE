@@ -1,9 +1,21 @@
 // @ts-ignore
 import React from 'react';
 // @ts-ignore
+import ReactDOM from 'react-dom';
+// @ts-ignore
 import { Widget } from '@lumino/widgets';
+import { MainPage } from './MainPage';
+import { CreateProjectWizard } from './CreateProjectWizard';
+import { JoinProject } from './JoinProject';
+import { ProjectWorkspace } from './ProjectWorkspace';
+import { ProjectConfig } from './types';
+
+type ViewType = 'main' | 'create' | 'join' | 'workspace';
 
 export class CollabManagerWidget extends Widget {
+  private currentView: ViewType = 'main';
+  private currentProject: ProjectConfig | null = null;
+
   constructor() {
     super();
     // @ts-ignore
@@ -12,18 +24,74 @@ export class CollabManagerWidget extends Widget {
     this.title.label = 'Collaboration Manager';
     this.title.closable = true;
     
-    // Create a simple HTML content
-    const content = document.createElement('div');
-    content.style.padding = '20px';
-    content.style.fontSize = '16px';
-    content.style.color = '#333';
-    content.innerHTML = `
-      <h2>Welcome to Collaboration Manager!</h2>
-      <p>This is a blank page where you can build your collaboration features.</p>
-      <p>You can add React components, forms, or any other UI elements here.</p>
-    `;
+    this.render();
+  }
+
+  private render() {
+    // @ts-ignore
+    const container = this.node;
+    container.innerHTML = '';
+    
+    let content;
+    
+    switch (this.currentView) {
+      case 'main':
+        content = React.createElement(MainPage, {
+          onCreateProject: () => this.showCreateProject(),
+          onJoinProject: () => this.showJoinProject()
+        });
+        break;
+      case 'create':
+        content = React.createElement(CreateProjectWizard, {
+          onBack: () => this.showMain(),
+          onProjectCreated: (project: ProjectConfig) => this.showWorkspace(project)
+        });
+        break;
+      case 'join':
+        content = React.createElement(JoinProject, {
+          onBack: () => this.showMain(),
+          onProjectJoined: (projectId: string) => this.showMain() // 暂时回到主页面
+        });
+        break;
+      case 'workspace':
+        if (this.currentProject) {
+          content = React.createElement(ProjectWorkspace, {
+            project: this.currentProject,
+            onBack: () => this.showMain()
+          });
+        } else {
+          content = React.createElement('div', { style: { padding: '20px' } }, 'No project selected');
+        }
+        break;
+      default:
+        content = React.createElement('div', { style: { padding: '20px' } }, 'Unknown view');
+    }
     
     // @ts-ignore
-    this.node.appendChild(content);
+    const reactContainer = document.createElement('div');
+    ReactDOM.render(content, reactContainer);
+    container.appendChild(reactContainer);
+  }
+
+  private showMain() {
+    this.currentView = 'main';
+    this.currentProject = null;
+    this.render();
+  }
+
+  private showCreateProject() {
+    this.currentView = 'create';
+    this.render();
+  }
+
+  private showJoinProject() {
+    this.currentView = 'join';
+    this.render();
+  }
+
+  private showWorkspace(project: ProjectConfig) {
+    this.currentView = 'workspace';
+    this.currentProject = project;
+    this.render();
   }
 }

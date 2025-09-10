@@ -6,7 +6,7 @@ from .component_containerizer.handlers import ExtractorHandler, TypesHandler, Ba
     BaseImageTagsHandler
 from .dataset_search.handlers import DatasetSearchHandler, DatasetDownloadHandler
 from .experiment_manager.handlers import ExportWorkflowHandler, ExecuteWorkflowHandler
-from .handlers import CatalogGetAllHandler
+from .handlers import CatalogGetAllHandler, CollabManagerHandler, JoinProjectHandler
 from .notebook_search.handlers import NotebookSearchHandler, NotebookSearchRatingHandler, NotebookDownloadHandler, \
     NotebookSeachHistoryHandler, NotebookSourceHandler
 from .registries.handlers import RegistriesHandler
@@ -41,7 +41,9 @@ def load_jupyter_server_extension(lab_app):
         (url_path_join(lab_app.web_app.settings['base_url'], r'/vre/expmanager/export'), ExportWorkflowHandler),
         (url_path_join(lab_app.web_app.settings['base_url'], r'/vre/expmanager/execute'), ExecuteWorkflowHandler),
         (url_path_join(lab_app.web_app.settings['base_url'], r'/vre/repositories/?'), RepositoriesHandler),
-        (url_path_join(lab_app.web_app.settings['base_url'], r'/vre/registries/?'), RegistriesHandler)
+        (url_path_join(lab_app.web_app.settings['base_url'], r'/vre/registries/?'), RegistriesHandler),
+        (url_path_join(lab_app.web_app.settings['base_url'], r'/vre/collab/projects'), CollabManagerHandler),
+        (url_path_join(lab_app.web_app.settings['base_url'], r'/vre/collab/join'), JoinProjectHandler)
     ])
 
     lab_app.log.info("Registered NaaVRRE extension at URL path /vre")

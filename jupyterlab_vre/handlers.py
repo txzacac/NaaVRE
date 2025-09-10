@@ -8,6 +8,7 @@ from notebook.base.handlers import APIHandler
 from tornado import web
 
 from jupyterlab_vre.database.catalog import Catalog
+from jupyterlab_vre.collab_manager.handlers import CollabManagerHandler, JoinProjectHandler
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
