@@ -43,8 +43,8 @@ async function activate (
             labShell.add(widget, 'left');
         }
     });
-    alert('DatasetSearchWidget');
-    console.log('DatasetSearchWidget');
+    // alert('DatasetSearchWidget');
+    // console.log('DatasetSearchWidget');
     
     return { widget };
 }

@@ -16,7 +16,7 @@ export const JoinProject: React.FC<JoinProjectProps> = ({ onBack, onProjectJoine
     }
 
     try {
-      // 获取 CSRF token
+      // get CSRF token
       const xsrfToken = document.querySelector('meta[name="_xsrf"]')?.getAttribute('content') || 
                        document.cookie.split('; ').find(row => row.startsWith('_xsrf='))?.split('=')[1] || '';
 

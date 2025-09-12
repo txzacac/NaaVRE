@@ -1,26 +1,43 @@
 // @ts-ignore
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ProjectConfig, PHASES } from './types';
+import { PageConfig } from '@jupyterlab/coreutils';
 
-interface CreateProjectWizardProps {
+interface ProjectWizardProps {
+  mode: 'create' | 'modify';
   onBack: () => void;
-  onProjectCreated: (project: ProjectConfig) => void;
+  onProjectCreated?: (project: ProjectConfig) => void;
+  onProjectModified?: (project: ProjectConfig) => void;
+  initialProjectId?: string;
 }
 
-export const CreateProjectWizard: React.FC<CreateProjectWizardProps> = ({ onBack, onProjectCreated }) => {
+export const ProjectWizard: React.FC<ProjectWizardProps> = ({ 
+  mode, 
+  onBack, 
+  onProjectCreated, 
+  onProjectModified,
+  initialProjectId 
+}) => {
   const [step, setStep] = useState(1);
+  const [projectId, setProjectId] = useState(initialProjectId || '');
+  const [loading, setLoading] = useState(false);
   const [projectData, setProjectData] = useState({
+    id: '',
     name: '',
     description: '',
-    owner: 'Current User', // 默认当前用户
+    owner: mode === 'create' ? 'Current User' : '',
     tags: [] as string[],
     phases: [] as string[],
     modules: [] as string[]
   });
   const [newTag, setNewTag] = useState('');
 
+  // 计算总步数
+  const totalSteps = mode === 'create' ? 3 : 4;
+  const isModifyMode = mode === 'modify';
+
   const handleNext = () => {
-    if (step < 3) {
+    if (step < totalSteps) {
       setStep(step + 1);
     }
   };
@@ -66,18 +83,80 @@ export const CreateProjectWizard: React.FC<CreateProjectWizardProps> = ({ onBack
     }));
   };
 
+  const loadProject = async () => {
+    if (!projectId.trim()) {
+      alert('Please enter a Project ID');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const baseUrl = PageConfig.getBaseUrl();
+      const token = PageConfig.getToken();
+      
+      const authHeaders = {
+        'Authorization': `token ${token}`,
+        'Content-Type': 'application/json'
+      };
+
+      const response = await fetch(`${baseUrl}vre/collab/projects`, {
+        method: 'GET',
+        headers: authHeaders,
+        credentials: 'same-origin'
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      
+      if (result.success) {
+        const project = result.projects.find((p: any) => p.id === projectId.trim());
+        
+        if (project) {
+          setProjectData({
+            id: project.id,
+            name: project.name,
+            description: project.description || '',
+            owner: project.owner,
+            tags: project.tags || [],
+            phases: project.phases || [],
+            modules: project.modules || []
+          });
+          setStep(2); // Move to step 2 after loading
+        } else {
+          alert('Project not found. Please check the Project ID and try again.');
+        }
+      } else {
+        alert(`Failed to load projects: ${result.error}`);
+      }
+    } catch (error) {
+      console.error('Error loading project:', error);
+      alert('Failed to load project. Please check the Project ID and try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleCreateProject = async () => {
     try {
-      // 获取 CSRF token
-      const xsrfToken = document.querySelector('meta[name="_xsrf"]')?.getAttribute('content') || 
+      const baseUrl = PageConfig.getBaseUrl();
+      const token = PageConfig.getToken();
+      
+      // 获取CSRF token
+      const xsrfToken = document.querySelector('meta[name="_xsrf"]')?.getAttribute('content') ||
                        document.cookie.split('; ').find(row => row.startsWith('_xsrf='))?.split('=')[1] || '';
+      
+      const authHeaders = {
+        'Authorization': `token ${token}`,
+        'Content-Type': 'application/json',
+        'X-XSRFToken': xsrfToken
+      };
 
-      const response = await fetch('/vre/collab/projects', {
+      const response = await fetch(`${baseUrl}vre/collab/projects`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-XSRFToken': xsrfToken
-        },
+        headers: authHeaders,
         credentials: 'same-origin',
         body: JSON.stringify({
           name: projectData.name,
@@ -96,8 +175,8 @@ export const CreateProjectWizard: React.FC<CreateProjectWizardProps> = ({ onBack
       const result = await response.json();
       
       if (result.success) {
-        alert(`Project created successfully! Project ID: ${result.project.id}`);
-        onProjectCreated(result.project);
+        alert(`Project created successfully! \n Project ID: ${result.project.id}`);
+        onProjectCreated?.(result.project);
       } else {
         alert(`Failed to create project: ${result.error}`);
       }
@@ -107,7 +186,138 @@ export const CreateProjectWizard: React.FC<CreateProjectWizardProps> = ({ onBack
     }
   };
 
-  const renderStep1 = () => (
+  const handleUpdateProject = async () => {
+    try {
+      if (!projectData.id.trim()) {
+        alert('Project ID missing. Load a project first.');
+        return;
+      }
+
+      const baseUrl = PageConfig.getBaseUrl();
+      const token = PageConfig.getToken();
+      
+      // 获取CSRF token
+      const xsrfToken = document.querySelector('meta[name="_xsrf"]')?.getAttribute('content') ||
+                       document.cookie.split('; ').find(row => row.startsWith('_xsrf='))?.split('=')[1] || '';
+      
+      const authHeaders = {
+        'Authorization': `token ${token}`,
+        'Content-Type': 'application/json',
+        'X-XSRFToken': xsrfToken
+      };
+
+      const response = await fetch(`${baseUrl}vre/collab/projects`, {
+        method: 'POST',
+        headers: authHeaders,
+        credentials: 'same-origin',
+        body: JSON.stringify({
+          _action: 'update',
+          id: projectData.id,
+          name: projectData.name,
+          description: projectData.description,
+          owner: projectData.owner,
+          tags: projectData.tags,
+          phases: projectData.phases,
+          modules: projectData.modules
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      
+      if (result.success) {
+        alert('Project updated successfully!');
+        onProjectModified?.(result.project);
+      } else {
+        alert(`Failed to update project: ${result.error}`);
+      }
+    } catch (error) {
+      console.error('Error updating project:', error);
+      alert('Failed to update project. Please try again.');
+    }
+  };
+
+  const renderLoadProjectStep = () => (
+    <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+      <h2 style={{ textAlign: 'center', marginBottom: '30px', color: '#333' }}>
+        Load Project to Modify
+      </h2>
+      
+      <div style={{ marginBottom: '30px' }}>
+        <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#555' }}>
+          Project ID *
+        </label>
+        <input
+          type="text"
+          value={projectId}
+          onChange={(e) => setProjectId(e.target.value)}
+          onKeyPress={(e) => e.key === 'Enter' && loadProject()}
+          style={{
+            width: '100%',
+            padding: '12px',
+            border: '2px solid #ddd',
+            borderRadius: '8px',
+            fontSize: '16px'
+          }}
+          placeholder="Enter Project ID (e.g., 8d614f6b-2660-4715-8647-b3e97e5db24b)"
+        />
+      </div>
+
+      <div style={{ display: 'flex', gap: '15px' }}>
+        <button
+          onClick={onBack}
+          style={{
+            flex: 1,
+            padding: '12px 24px',
+            background: '#6c757d',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontSize: '16px'
+          }}
+        >
+          Back to Main
+        </button>
+        <button
+          onClick={loadProject}
+          disabled={!projectId.trim() || loading}
+          style={{
+            flex: 1,
+            padding: '12px 24px',
+            background: !projectId.trim() || loading ? '#ccc' : '#667eea',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: !projectId.trim() || loading ? 'not-allowed' : 'pointer',
+            fontSize: '16px'
+          }}
+        >
+          {loading ? 'Loading...' : 'Load Project'}
+        </button>
+      </div>
+
+      <div style={{ 
+        marginTop: '30px', 
+        padding: '20px', 
+        background: '#f8f9fa', 
+        borderRadius: '8px',
+        border: '1px solid #e9ecef'
+      }}>
+        <h4 style={{ margin: '0 0 10px 0', color: '#333' }}>How to get a Project ID?</h4>
+        <ul style={{ margin: 0, paddingLeft: '20px', color: '#666', fontSize: '14px' }}>
+          <li>Check your project list in the workspace</li>
+          <li>Ask the project owner to share the Project ID</li>
+          <li>Look for the Project ID in project documentation</li>
+        </ul>
+      </div>
+    </div>
+  );
+
+  const renderBasicInfoStep = () => (
     <div style={{ maxWidth: '600px', margin: '0 auto' }}>
       <h2 style={{ textAlign: 'center', marginBottom: '30px', color: '#333' }}>
         Basic Information
@@ -239,7 +449,7 @@ export const CreateProjectWizard: React.FC<CreateProjectWizardProps> = ({ onBack
     </div>
   );
 
-  const renderStep2 = () => (
+  const renderPhasesStep = () => (
     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
       <h2 style={{ textAlign: 'center', marginBottom: '30px', color: '#333' }}>
         Select Research Phases
@@ -280,7 +490,7 @@ export const CreateProjectWizard: React.FC<CreateProjectWizardProps> = ({ onBack
     </div>
   );
 
-  const renderStep3 = () => (
+  const renderModulesStep = () => (
     <div style={{ maxWidth: '900px', margin: '0 auto' }}>
       <h2 style={{ textAlign: 'center', marginBottom: '30px', color: '#333' }}>
         Select Collaboration Modules
@@ -334,12 +544,66 @@ export const CreateProjectWizard: React.FC<CreateProjectWizardProps> = ({ onBack
     </div>
   );
 
+  const getStepContent = () => {
+    if (isModifyMode) {
+      switch (step) {
+        case 1: return renderLoadProjectStep();
+        case 2: return renderBasicInfoStep();
+        case 3: return renderPhasesStep();
+        case 4: return renderModulesStep();
+        default: return null;
+      }
+    } else {
+      switch (step) {
+        case 1: return renderBasicInfoStep();
+        case 2: return renderPhasesStep();
+        case 3: return renderModulesStep();
+        default: return null;
+      }
+    }
+  };
+
+  const canProceed = () => {
+    if (isModifyMode) {
+      switch (step) {
+        case 1: return projectId.trim() !== '';
+        case 2: return projectData.name.trim() !== '';
+        case 3: return projectData.phases.length > 0;
+        case 4: return true;
+        default: return false;
+      }
+    } else {
+      switch (step) {
+        case 1: return projectData.name.trim() !== '';
+        case 2: return projectData.phases.length > 0;
+        case 3: return true;
+        default: return false;
+      }
+    }
+  };
+
+  const getButtonText = () => {
+    if (isModifyMode) {
+      return step === totalSteps ? 'Update Project' : 'Next';
+    } else {
+      return step === totalSteps ? 'Create Project' : 'Next';
+    }
+  };
+
+  const handleSubmit = () => {
+    if (isModifyMode) {
+      handleUpdateProject();
+    } else {
+      handleCreateProject();
+    }
+  };
+
   return (
     <div style={{ padding: '40px', minHeight: '100vh', background: '#f8f9fa' }}>
       {/* Progress Bar */}
       <div style={{ maxWidth: '600px', margin: '0 auto 40px auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
-          {[1, 2, 3].map(stepNum => (
+          {Array.from({ length: totalSteps }, (_, i) => i + 1).map(stepNum => (
             <div
               key={stepNum}
               style={{
@@ -363,7 +627,7 @@ export const CreateProjectWizard: React.FC<CreateProjectWizardProps> = ({ onBack
             style={{
               background: '#667eea',
               height: '100%',
-              width: `${(step / 3) * 100}%`,
+              width: `${(step / totalSteps) * 100}%`,
               borderRadius: '2px',
               transition: 'width 0.3s ease'
             }}
@@ -372,9 +636,7 @@ export const CreateProjectWizard: React.FC<CreateProjectWizardProps> = ({ onBack
       </div>
 
       {/* Step Content */}
-      {step === 1 && renderStep1()}
-      {step === 2 && renderStep2()}
-      {step === 3 && renderStep3()}
+      {getStepContent()}
 
       {/* Navigation Buttons */}
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '40px', maxWidth: '600px', margin: '40px auto 0 auto' }}>
@@ -393,17 +655,17 @@ export const CreateProjectWizard: React.FC<CreateProjectWizardProps> = ({ onBack
           {step === 1 ? 'Back to Main' : 'Previous'}
         </button>
         
-        {step < 3 ? (
+        {step < totalSteps ? (
           <button
             onClick={handleNext}
-            disabled={step === 1 && !projectData.name.trim()}
+            disabled={!canProceed()}
             style={{
               padding: '12px 24px',
-              background: step === 1 && !projectData.name.trim() ? '#ccc' : '#667eea',
+              background: !canProceed() ? '#ccc' : '#667eea',
               color: 'white',
               border: 'none',
               borderRadius: '8px',
-              cursor: step === 1 && !projectData.name.trim() ? 'not-allowed' : 'pointer',
+              cursor: !canProceed() ? 'not-allowed' : 'pointer',
               fontSize: '16px'
             }}
           >
@@ -411,7 +673,7 @@ export const CreateProjectWizard: React.FC<CreateProjectWizardProps> = ({ onBack
           </button>
         ) : (
           <button
-            onClick={handleCreateProject}
+            onClick={handleSubmit}
             style={{
               padding: '12px 24px',
               background: '#28a745',
@@ -422,7 +684,7 @@ export const CreateProjectWizard: React.FC<CreateProjectWizardProps> = ({ onBack
               fontSize: '16px'
             }}
           >
-            Create Project
+            {getButtonText()}
           </button>
         )}
       </div>

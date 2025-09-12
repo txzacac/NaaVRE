@@ -5,12 +5,12 @@ import ReactDOM from 'react-dom';
 // @ts-ignore
 import { Widget } from '@lumino/widgets';
 import { MainPage } from './MainPage';
-import { CreateProjectWizard } from './CreateProjectWizard';
+import { ProjectWizard } from './ProjectWizard';
 import { JoinProject } from './JoinProject';
 import { ProjectWorkspace } from './ProjectWorkspace';
 import { ProjectConfig } from './types';
 
-type ViewType = 'main' | 'create' | 'join' | 'workspace';
+type ViewType = 'main' | 'create' | 'join' | 'modify' | 'workspace';
 
 export class CollabManagerWidget extends Widget {
   private currentView: ViewType = 'main';
@@ -40,11 +40,13 @@ export class CollabManagerWidget extends Widget {
       case 'main':
         content = React.createElement(MainPage, {
           onCreateProject: () => this.showCreateProject(),
-          onJoinProject: () => this.showJoinProject()
+          onJoinProject: () => this.showJoinProject(),
+          onModifyProject: () => this.showModifyProject()
         });
         break;
       case 'create':
-        content = React.createElement(CreateProjectWizard, {
+        content = React.createElement(ProjectWizard, {
+          mode: 'create',
           onBack: () => this.showMain(),
           onProjectCreated: (project: ProjectConfig) => this.showWorkspace(project)
         });
@@ -53,6 +55,13 @@ export class CollabManagerWidget extends Widget {
         content = React.createElement(JoinProject, {
           onBack: () => this.showMain(),
           onProjectJoined: (project: ProjectConfig) => this.showWorkspace(project)
+        });
+        break;
+      case 'modify':
+        content = React.createElement(ProjectWizard, {
+          mode: 'modify',
+          onBack: () => this.showMain(),
+          onProjectModified: (project: ProjectConfig) => this.showWorkspace(project)
         });
         break;
       case 'workspace':
@@ -89,6 +98,11 @@ export class CollabManagerWidget extends Widget {
 
   private showJoinProject() {
     this.currentView = 'join';
+    this.render();
+  }
+
+  private showModifyProject() {
+    this.currentView = 'modify';
     this.render();
   }
 

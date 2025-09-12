@@ -42,6 +42,8 @@ def load_jupyter_server_extension(lab_app):
         (url_path_join(lab_app.web_app.settings['base_url'], r'/vre/expmanager/execute'), ExecuteWorkflowHandler),
         (url_path_join(lab_app.web_app.settings['base_url'], r'/vre/repositories/?'), RepositoriesHandler),
         (url_path_join(lab_app.web_app.settings['base_url'], r'/vre/registries/?'), RegistriesHandler),
+        (url_path_join(lab_app.web_app.settings['base_url'], r'/vre/collab/projects/?'), RegistriesHandler),
+        (url_path_join(lab_app.web_app.settings['base_url'], r'/vre/collab/projects/([^/]+)'), CollabManagerHandler),
         (url_path_join(lab_app.web_app.settings['base_url'], r'/vre/collab/projects'), CollabManagerHandler),
         (url_path_join(lab_app.web_app.settings['base_url'], r'/vre/collab/join'), JoinProjectHandler)
     ])

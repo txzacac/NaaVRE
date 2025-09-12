@@ -4,9 +4,10 @@ import React, { useState } from 'react';
 interface MainPageProps {
   onCreateProject: () => void;
   onJoinProject: () => void;
+  onModifyProject: () => void;
 }
 
-export const MainPage: React.FC<MainPageProps> = ({ onCreateProject, onJoinProject }) => {
+export const MainPage: React.FC<MainPageProps> = ({ onCreateProject, onJoinProject, onModifyProject }) => {
   return (
     <div style={{ 
       padding: '40px', 
@@ -31,7 +32,7 @@ export const MainPage: React.FC<MainPageProps> = ({ onCreateProject, onJoinProje
         gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
         gap: '30px',
         width: '100%',
-        maxWidth: '800px'
+        maxWidth: '1200px'
       }}>
         {/* Create Project Card */}
         <div 
@@ -96,6 +97,39 @@ export const MainPage: React.FC<MainPageProps> = ({ onCreateProject, onJoinProje
           </h2>
           <p style={{ color: '#666', lineHeight: '1.6', margin: 0 }}>
             Join an existing project using a Project ID. Get instant access to configured collaboration tools.
+          </p>
+        </div>
+
+        {/* Modify Project Card */}
+        <div 
+          onClick={onModifyProject}
+          style={{
+            background: 'white',
+            borderRadius: '12px',
+            padding: '40px',
+            textAlign: 'center',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+            border: '2px solid transparent'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-5px)';
+            e.currentTarget.style.boxShadow = '0 8px 30px rgba(0,0,0,0.15)';
+            e.currentTarget.style.borderColor = '#667eea';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.1)';
+            e.currentTarget.style.borderColor = 'transparent';
+          }}
+        >
+          <div style={{ fontSize: '3rem', marginBottom: '20px' }}>⚙️</div>
+          <h2 style={{ color: '#333', margin: '0 0 15px 0', fontSize: '1.5rem' }}>
+            Modify Project
+          </h2>
+          <p style={{ color: '#666', lineHeight: '1.6', margin: 0 }}>
+            Update an existing project configuration. Change phases, modules, and other project settings.
           </p>
         </div>
       </div>
