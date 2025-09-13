@@ -118,14 +118,14 @@ export class CollabManagerWidget extends Widget {
       return;
     }
 
-    // 根据模块 ID 执行相应的命令
+    // Execute corresponding commands based on module ID
     switch (moduleId) {
       case 'ideaBoard':
-        // 跳转到 experiment manager
+        // Navigate to experiment manager
         this.app.commands.execute('create-vre-composer');
         break;
       case 'clustering':
-        // 可以跳转到其他 widget
+        // Can navigate to other widgets
         this.app.commands.execute('create-vre-composer');
         break;
       case 'voting':
@@ -138,92 +138,132 @@ export class CollabManagerWidget extends Widget {
         this.app.commands.execute('create-vre-composer');
         break;
       case 'realtimeCoedit':
-        // 实时协作编辑 - 可以打开一个新的 notebook
+        // Real-time collaborative editing - can open a new notebook
         this.app.commands.execute('docmanager:new-untitled', { type: 'notebook' });
         break;
       case 'videoMeet':
-        // 视频会议 - 可以打开一个占位页面
+        // Video meeting - can open a placeholder page
         alert('Video Meeting feature is coming soon!');
         break;
       case 'chat':
-        // 聊天功能 - 可以打开一个占位页面
+        // Chat functionality - can open a placeholder page
         alert('Chat feature is coming soon!');
         break;
       case 'sharedGlossary':
-        // 共享词汇表 - 可以打开一个占位页面
+        // Shared glossary - can open a placeholder page
         alert('Shared Glossary feature is coming soon!');
         break;
       case 'onboardingDocs':
-        // 入门文档 - 可以打开一个占位页面
+        // Onboarding docs - can open a placeholder page
         alert('Onboarding Docs feature is coming soon!');
         break;
       case 'fileShare':
-        // 文件共享 - 可以打开文件浏览器
+        // File sharing - can open file browser
+        this.app.commands.execute('filebrowser:open');
+        break;
+      case 'gitIntegration':
+        // Git integration - can open file browser
         this.app.commands.execute('filebrowser:open');
         break;
       case 'taskBoard':
-        // 任务看板 - 可以打开 experiment manager
+        // Task board - can open experiment manager
         this.app.commands.execute('create-vre-composer');
         break;
       case 'workflowMap':
-        // 工作流地图 - 可以打开 experiment manager
+        // Workflow map - can open experiment manager
         this.app.commands.execute('create-vre-composer');
         break;
       case 'sprint':
-        // 冲刺管理 - 可以打开 experiment manager
+        // Sprint management - can open experiment manager
         this.app.commands.execute('create-vre-composer');
         break;
       case 'liveProgress':
-        // 实时进度 - 可以打开 experiment manager
+        // Live progress - can open experiment manager
         this.app.commands.execute('create-vre-composer');
         break;
       case 'phaseStruct':
-        // 阶段结构 - 可以打开 experiment manager
+        // Phase structure - can open experiment manager
         this.app.commands.execute('create-vre-composer');
         break;
       case 'scopedWorkspaces':
-        // 作用域工作区 - 可以打开文件浏览器
+        // Scoped workspaces - can open file browser
         this.app.commands.execute('filebrowser:open');
         break;
       case 'crossGroupDash':
-        // 跨组仪表板 - 可以打开 experiment manager
+        // Cross-group dashboard - can open experiment manager
         this.app.commands.execute('create-vre-composer');
         break;
       case 'integrationSchedule':
-        // 集成计划 - 可以打开 experiment manager
+        // Integration schedule - can open experiment manager
         this.app.commands.execute('create-vre-composer');
         break;
       case 'taskReassign':
-        // 任务重新分配 - 可以打开 experiment manager
+        // Task reassignment - can open experiment manager
         this.app.commands.execute('create-vre-composer');
         break;
       case 'inlineComment':
-        // 内联评论 - 可以打开一个占位页面
+        // Inline comments - can open a placeholder page
         alert('Inline Comments feature is coming soon!');
         break;
       case 'versionThread':
-        // 版本讨论 - 可以打开一个占位页面
+        // Version discussion - can open a placeholder page
         alert('Version Thread feature is coming soon!');
         break;
       case 'activityFeed':
-        // 活动动态 - 可以打开一个占位页面
+        // Activity feed - can open a placeholder page
         alert('Activity Feed feature is coming soon!');
         break;
       case 'contribAttribution':
-        // 贡献归属 - 可以打开一个占位页面
+        // Contribution attribution - can open a placeholder page
         alert('Contribution Attribution feature is coming soon!');
         break;
       case 'projectOverview':
-        // 项目概览 - 可以打开 experiment manager
+        // Project overview - can open experiment manager
         this.app.commands.execute('create-vre-composer');
         break;
       case 'exportReport':
-        // 导出报告 - 可以打开一个占位页面
+        // Export report - can open a placeholder page
         alert('Export Report feature is coming soon!');
         break;
-      case 'artifactRegistry':
-        // 制品注册表 - 可以打开一个占位页面
-        alert('Artifact Registry feature is coming soon!');
+      case 'metadataTemplates':
+        // Metadata templates - can open a placeholder page
+        alert('Metadata Templates feature is coming soon!');
+        break;
+      case 'auditTrails':
+        // Audit trails - can open a placeholder page
+        alert('Audit Trails feature is coming soon!');
+        break;
+      case 'openDataSharing':
+        // Open data sharing - can open a placeholder page
+        alert('Open Data Sharing feature is coming soon!');
+        break;
+      case 'visualizationDashboard':
+        // Visualization dashboard - can open experiment manager
+        this.app.commands.execute('create-vre-composer');
+        break;
+      case 'provenanceExplorer':
+        // Provenance explorer - can open a placeholder page
+        alert('Provenance Explorer feature is coming soon!');
+        break;
+      case 'rolePermission':
+        // Role permissions - can open a placeholder page
+        alert('Role & Permission feature is coming soon!');
+        break;
+      case 'accessControl':
+        // Access control - can open a placeholder page
+        alert('Access Control feature is coming soon!');
+        break;
+      case 'referenceManager':
+        // Reference manager - can open a placeholder page
+        alert('Reference Manager feature is coming soon!');
+        break;
+      case 'searchDiscovery':
+        // Search discovery - can open a placeholder page
+        alert('Search & Discovery feature is coming soon!');
+        break;
+      case 'workflowBuilder':
+        // Workflow builder - can open experiment manager
+        this.app.commands.execute('create-vre-composer');
         break;
       default:
         alert(`Module "${moduleId}" is under construction. This feature will be available soon!`);

@@ -27,63 +27,79 @@ export const PHASES: Phase[] = [
   {
     id: 'ideation-planning',
     name: 'Ideation & Planning',
-    description: '头脑风暴、目标对齐等',
+    description: 'Brainstorming, goal alignment, and planning activities',
     modules: [
-      { id: 'ideaBoard', name: 'Idea Board', description: '创意收集板', phase: 'ideation-planning' },
-      { id: 'clustering', name: 'Clustering', description: '想法聚类', phase: 'ideation-planning' },
-      { id: 'voting', name: 'Voting', description: '投票决策', phase: 'ideation-planning' },
-      { id: 'goalNegotiation', name: 'Goal Negotiation', description: '目标协商', phase: 'ideation-planning' },
-      { id: 'teamRoles', name: 'Team Roles', description: '团队角色分配', phase: 'ideation-planning' }
+      { id: 'ideaBoard', name: 'Idea Board', description: 'Virtual whiteboard and sticky notes for brainstorming ideas', phase: 'ideation-planning' },
+      { id: 'clustering', name: 'Clustering', description: 'Group similar ideas into thematic clusters for synthesis', phase: 'ideation-planning' },
+      { id: 'voting', name: 'Voting', description: 'Voting and prioritization to help the team reach consensus', phase: 'ideation-planning' },
+      { id: 'goalNegotiation', name: 'Goal Negotiation', description: 'Interface for structured goal discussion and consensus-building', phase: 'ideation-planning' },
+      { id: 'teamRoles', name: 'Team Roles', description: 'Team role overview to clarify responsibilities', phase: 'ideation-planning' },
+      { id: 'phaseStruct', name: 'Phase Structuring', description: 'Organize work into phases with deliverables and approval gates', phase: 'ideation-planning' }
     ]
   },
   {
     id: 'collaboration-coproduction',
-    name: 'Collaboration & Co-production',
-    description: '实时协作、共享词汇表等',
+    name: 'Collaboration & Content Co-production',
+    description: 'Real-time collaboration, shared glossaries, and content co-production',
     modules: [
-      { id: 'realtimeCoedit', name: 'Real-time Co-editing', description: '实时协作编辑', phase: 'collaboration-coproduction' },
-      { id: 'videoMeet', name: 'Video Meeting', description: '视频会议', phase: 'collaboration-coproduction' },
-      { id: 'chat', name: 'Chat', description: '即时聊天', phase: 'collaboration-coproduction' },
-      { id: 'sharedGlossary', name: 'Shared Glossary', description: '共享词汇表', phase: 'collaboration-coproduction' },
-      { id: 'onboardingDocs', name: 'Onboarding Docs', description: '入门文档', phase: 'collaboration-coproduction' },
-      { id: 'fileShare', name: 'File Share', description: '文件共享', phase: 'collaboration-coproduction' }
+      { id: 'realtimeCoedit', name: 'Real-time Co-editing', description: 'Collaborative editing of docs/code (supports Jupyter & manuscripts)', phase: 'collaboration-coproduction' },
+      { id: 'videoMeet', name: 'Video Meeting', description: 'Integrated video conferencing (Zoom/Teams/Jitsi)', phase: 'collaboration-coproduction' },
+      { id: 'chat', name: 'Chat', description: 'Instant messaging channels for quick communication', phase: 'collaboration-coproduction' },
+      { id: 'sharedGlossary', name: 'Shared Glossary', description: 'Central glossary to align terminology across disciplines', phase: 'collaboration-coproduction' },
+      { id: 'onboardingDocs', name: 'Onboarding Docs', description: 'Documents to help new members integrate quickly', phase: 'collaboration-coproduction' },
+      { id: 'fileShare', name: 'File Share', description: 'File and dataset sharing within the project', phase: 'collaboration-coproduction' },
+      { id: 'gitIntegration', name: 'Git Integration', description: 'Built-in Git repository for version control and code collaboration', phase: 'collaboration-coproduction' }
     ]
   },
   {
     id: 'workflow-tracking',
     name: 'Workflow Tracking & Task Coordination',
-    description: '任务面板、进度追踪等',
+    description: 'Task boards, progress tracking, and workflow coordination',
     modules: [
-      { id: 'taskBoard', name: 'Task Board', description: '任务看板', phase: 'workflow-tracking' },
-      { id: 'workflowMap', name: 'Workflow Map', description: '工作流地图', phase: 'workflow-tracking' },
-      { id: 'sprint', name: 'Sprint', description: '冲刺管理', phase: 'workflow-tracking' },
-      { id: 'liveProgress', name: 'Live Progress', description: '实时进度', phase: 'workflow-tracking' },
-      { id: 'phaseStruct', name: 'Phase Structure', description: '阶段结构', phase: 'workflow-tracking' },
-      { id: 'scopedWorkspaces', name: 'Scoped Workspaces', description: '作用域工作区', phase: 'workflow-tracking' },
-      { id: 'crossGroupDash', name: 'Cross-group Dashboard', description: '跨组仪表板', phase: 'workflow-tracking' },
-      { id: 'integrationSchedule', name: 'Integration Schedule', description: '集成计划', phase: 'workflow-tracking' },
-      { id: 'taskReassign', name: 'Task Reassignment', description: '任务重新分配', phase: 'workflow-tracking' }
+      { id: 'taskBoard', name: 'Task Board', description: 'Kanban-style task board to track assignments and status', phase: 'workflow-tracking' },
+      { id: 'workflowMap', name: 'Workflow Map', description: 'Visual workflow map showing dependencies and transitions', phase: 'workflow-tracking' },
+      { id: 'sprint', name: 'Sprint Planning', description: 'Agile sprint planning and iteration management', phase: 'workflow-tracking' },
+      { id: 'liveProgress', name: 'Live Progress', description: 'Real-time progress tracking and priority indicators', phase: 'workflow-tracking' },
+      { id: 'scopedWorkspaces', name: 'Scoped Workspaces', description: 'Dedicated sub-group workspaces for focused collaboration', phase: 'workflow-tracking' },
+      { id: 'crossGroupDash', name: 'Cross-group Dashboard', description: 'Integrated dashboard combining multiple team views', phase: 'workflow-tracking' },
+      { id: 'integrationSchedule', name: 'Integration Schedule', description: 'Shared calendar and scheduling tools for coordination', phase: 'workflow-tracking' },
+      { id: 'taskReassign', name: 'Task Reassignment', description: 'Reassign and reconfigure tasks dynamically', phase: 'workflow-tracking' }
     ]
   },
   {
     id: 'review-feedback',
     name: 'Review & Feedback',
-    description: '评论、版本追踪、贡献归属等',
+    description: 'Comments, version tracking, and contribution attribution',
     modules: [
-      { id: 'inlineComment', name: 'Inline Comments', description: '内联评论', phase: 'review-feedback' },
-      { id: 'versionThread', name: 'Version Thread', description: '版本讨论', phase: 'review-feedback' },
-      { id: 'activityFeed', name: 'Activity Feed', description: '活动动态', phase: 'review-feedback' },
-      { id: 'contribAttribution', name: 'Contribution Attribution', description: '贡献归属', phase: 'review-feedback' },
-      { id: 'projectOverview', name: 'Project Overview', description: '项目概览', phase: 'review-feedback' }
+      { id: 'inlineComment', name: 'Inline Comments', description: 'Context-aware inline comments in docs or notebooks', phase: 'review-feedback' },
+      { id: 'versionThread', name: 'Version Thread', description: 'Version tracking with threaded discussions', phase: 'review-feedback' },
+      { id: 'activityFeed', name: 'Activity Feed', description: 'Live feed showing document edits and task updates', phase: 'review-feedback' },
+      { id: 'contribAttribution', name: 'Contribution Attribution', description: 'Tagging contributions for accountability and recognition', phase: 'review-feedback' }
     ]
   },
   {
     id: 'dissemination-finalization',
-    name: 'Dissemination & Finalization',
-    description: '成果发布、最终化等',
+    name: 'Finalization & Dissemination',
+    description: 'Results publication, finalization, and dissemination',
     modules: [
-      { id: 'exportReport', name: 'Export Report', description: '导出报告', phase: 'dissemination-finalization' },
-      { id: 'artifactRegistry', name: 'Artifact Registry', description: '制品注册表', phase: 'dissemination-finalization' }
+      { id: 'metadataTemplates', name: 'Metadata Templates', description: 'Structured forms to document datasets and experiments for reproducibility', phase: 'dissemination-finalization' },
+      { id: 'auditTrails', name: 'Audit Trails', description: 'Log system that records who accessed, modified, or shared data, with timestamps for full accountability', phase: 'dissemination-finalization' },
+      { id: 'projectOverview', name: 'Project Overview', description: 'Centralized overview of goals, timelines, and deliverables', phase: 'dissemination-finalization' },
+      { id: 'openDataSharing', name: 'Open Data Sharing', description: 'Publish datasets, code, and papers with DOI integration', phase: 'dissemination-finalization' },
+      { id: 'visualizationDashboard', name: 'Visualization & Dashboard', description: 'Built-in plotting and analytical dashboards', phase: 'dissemination-finalization' },
+      { id: 'provenanceExplorer', name: 'Provenance Explorer', description: 'Tool that shows the full history of a result, from raw data to final output', phase: 'dissemination-finalization' }
+    ]
+  },
+  {
+    id: 'cross-phase-infrastructure',
+    name: 'Cross-phase Infrastructure',
+    description: 'Cross-phase infrastructure and shared services',
+    modules: [
+      { id: 'rolePermission', name: 'Role & Permission', description: 'Role-based project access (PI, researcher, student, collaborator)', phase: 'cross-phase-infrastructure' },
+      { id: 'accessControl', name: 'Access Control', description: 'Hierarchical permission management down to file/task level', phase: 'cross-phase-infrastructure' },
+      { id: 'referenceManager', name: 'Reference Manager', description: 'Integrated Zotero/Mendeley library for citations', phase: 'cross-phase-infrastructure' },
+      { id: 'searchDiscovery', name: 'Search & Discovery', description: 'Cross-project search for notebooks, data, and documents', phase: 'cross-phase-infrastructure' },
+      { id: 'workflowBuilder', name: 'Workflow Builder', description: 'Pipeline builder with Docker/Conda packaging for reproducible workflows', phase: 'cross-phase-infrastructure' }
     ]
   }
 ];

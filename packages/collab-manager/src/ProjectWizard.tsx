@@ -32,7 +32,7 @@ export const ProjectWizard: React.FC<ProjectWizardProps> = ({
   });
   const [newTag, setNewTag] = useState('');
 
-  // 计算总步数
+  // Calculate total steps
   const totalSteps = mode === 'create' ? 3 : 4;
   const isModifyMode = mode === 'modify';
 
@@ -63,6 +63,24 @@ export const ProjectWizard: React.FC<ProjectWizardProps> = ({
       modules: prev.modules.includes(moduleId)
         ? prev.modules.filter(id => id !== moduleId)
         : [...prev.modules, moduleId]
+    }));
+  };
+
+  const handleSelectAllModules = () => {
+    const allModules = PHASES
+      .filter(phase => projectData.phases.includes(phase.id))
+      .flatMap(phase => phase.modules.map(module => module.id));
+    
+    setProjectData(prev => ({
+      ...prev,
+      modules: allModules
+    }));
+  };
+
+  const handleDeselectAllModules = () => {
+    setProjectData(prev => ({
+      ...prev,
+      modules: []
     }));
   };
 
@@ -144,7 +162,7 @@ export const ProjectWizard: React.FC<ProjectWizardProps> = ({
       const baseUrl = PageConfig.getBaseUrl();
       const token = PageConfig.getToken();
       
-      // 获取CSRF token
+      // Get CSRF token
       const xsrfToken = document.querySelector('meta[name="_xsrf"]')?.getAttribute('content') ||
                        document.cookie.split('; ').find(row => row.startsWith('_xsrf='))?.split('=')[1] || '';
       
@@ -196,7 +214,7 @@ export const ProjectWizard: React.FC<ProjectWizardProps> = ({
       const baseUrl = PageConfig.getBaseUrl();
       const token = PageConfig.getToken();
       
-      // 获取CSRF token
+      // Get CSRF token
       const xsrfToken = document.querySelector('meta[name="_xsrf"]')?.getAttribute('content') ||
                        document.cookie.split('; ').find(row => row.startsWith('_xsrf='))?.split('=')[1] || '';
       
@@ -490,16 +508,67 @@ export const ProjectWizard: React.FC<ProjectWizardProps> = ({
     </div>
   );
 
-  const renderModulesStep = () => (
-    <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-      <h2 style={{ textAlign: 'center', marginBottom: '30px', color: '#333' }}>
-        Select Collaboration Modules
-      </h2>
-      <p style={{ textAlign: 'center', color: '#666', marginBottom: '30px' }}>
-        Choose the specific modules you want to enable for each selected phase
-      </p>
-      
-      <div style={{ display: 'grid', gap: '30px' }}>
+  const renderModulesStep = () => {
+    const allAvailableModules = PHASES
+      .filter(phase => projectData.phases.includes(phase.id))
+      .flatMap(phase => phase.modules.map(module => module.id));
+    
+    const allSelected = allAvailableModules.length > 0 && 
+      allAvailableModules.every(moduleId => projectData.modules.includes(moduleId));
+    
+    return (
+      <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+        <h2 style={{ textAlign: 'center', marginBottom: '30px', color: '#333' }}>
+          Select Collaboration Modules
+        </h2>
+        <p style={{ textAlign: 'center', color: '#666', marginBottom: '30px' }}>
+          Choose the specific modules you want to enable for each selected phase
+        </p>
+        
+        {/* Select All / Deselect All buttons */}
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          gap: '15px', 
+          marginBottom: '30px' 
+        }}>
+          <button
+            onClick={handleSelectAllModules}
+            disabled={allAvailableModules.length === 0}
+            style={{
+              padding: '10px 20px',
+              background: allSelected ? '#4caf50' : '#667eea',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: allAvailableModules.length === 0 ? 'not-allowed' : 'pointer',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              opacity: allAvailableModules.length === 0 ? 0.5 : 1
+            }}
+          >
+            {allSelected ? 'All Selected' : 'Select All'}
+          </button>
+          <button
+            onClick={handleDeselectAllModules}
+            disabled={projectData.modules.length === 0}
+            style={{
+              padding: '10px 20px',
+              background: projectData.modules.length === 0 ? '#ccc' : '#f44336',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: projectData.modules.length === 0 ? 'not-allowed' : 'pointer',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              opacity: projectData.modules.length === 0 ? 0.5 : 1
+            }}
+          >
+            Deselect All
+          </button>
+        </div>
+        
+        <div style={{ display: 'grid', gap: '30px' }}>
         {PHASES.filter(phase => projectData.phases.includes(phase.id)).map(phase => (
           <div key={phase.id} style={{ border: '1px solid #ddd', borderRadius: '12px', padding: '20px' }}>
             <h3 style={{ margin: '0 0 15px 0', color: '#333', borderBottom: '2px solid #667eea', paddingBottom: '10px' }}>
@@ -540,9 +609,10 @@ export const ProjectWizard: React.FC<ProjectWizardProps> = ({
             </div>
           </div>
         ))}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const getStepContent = () => {
     if (isModifyMode) {
