@@ -708,45 +708,14 @@ export const ProjectWizard: React.FC<ProjectWizardProps> = ({
       {/* Step Content */}
       {getStepContent()}
 
-      {/* Navigation Buttons */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '40px', maxWidth: '600px', margin: '40px auto 0 auto' }}>
-        <button
-          onClick={step === 1 ? onBack : handleBack}
-          style={{
-            padding: '12px 24px',
-            background: step === 1 ? '#6c757d' : '#667eea',
-            color: 'white',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            fontSize: '16px'
-          }}
-        >
-          {step === 1 ? 'Back to Main' : 'Previous'}
-        </button>
-        
-        {step < totalSteps ? (
+      {/* Navigation Buttons - Hide on Load Project step in modify mode */}
+      {!(isModifyMode && step === 1) && (
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '40px', maxWidth: '600px', margin: '40px auto 0 auto' }}>
           <button
-            onClick={handleNext}
-            disabled={!canProceed()}
+            onClick={step === 1 ? onBack : handleBack}
             style={{
               padding: '12px 24px',
-              background: !canProceed() ? '#ccc' : '#667eea',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: !canProceed() ? 'not-allowed' : 'pointer',
-              fontSize: '16px'
-            }}
-          >
-            Next
-          </button>
-        ) : (
-          <button
-            onClick={handleSubmit}
-            style={{
-              padding: '12px 24px',
-              background: '#28a745',
+              background: step === 1 ? '#6c757d' : '#667eea',
               color: 'white',
               border: 'none',
               borderRadius: '8px',
@@ -754,10 +723,43 @@ export const ProjectWizard: React.FC<ProjectWizardProps> = ({
               fontSize: '16px'
             }}
           >
-            {getButtonText()}
+            {step === 1 ? 'Back to Main' : 'Previous'}
           </button>
-        )}
-      </div>
+          
+          {step < totalSteps ? (
+            <button
+              onClick={handleNext}
+              disabled={!canProceed()}
+              style={{
+                padding: '12px 24px',
+                background: !canProceed() ? '#ccc' : '#667eea',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: !canProceed() ? 'not-allowed' : 'pointer',
+                fontSize: '16px'
+              }}
+            >
+              Next
+            </button>
+          ) : (
+            <button
+              onClick={handleSubmit}
+              style={{
+                padding: '12px 24px',
+                background: '#28a745',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '16px'
+              }}
+            >
+              {getButtonText()}
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 };
