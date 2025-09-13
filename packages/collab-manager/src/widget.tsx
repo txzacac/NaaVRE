@@ -142,8 +142,19 @@ export class CollabManagerWidget extends Widget {
         this.app.commands.execute('docmanager:new-untitled', { type: 'notebook' });
         break;
       case 'videoMeet':
-        // Video meeting - can open a placeholder page
-        alert('Video Meeting feature is coming soon!');
+        // Video meeting - open Video Chat extension
+        try {
+          this.app.commands.execute('jupyterlab-videochat:open');
+        } catch (error) {
+          console.error('Failed to open Video Chat:', error);
+          // Fallback: try alternative command names
+          try {
+            this.app.commands.execute('videochat:open');
+          } catch (error2) {
+            console.error('Failed to open Video Chat with alternative command:', error2);
+            alert('Video Chat feature is not available. Please check if the extension is properly installed.');
+          }
+        }
         break;
       case 'chat':
         // Chat functionality - can open a placeholder page

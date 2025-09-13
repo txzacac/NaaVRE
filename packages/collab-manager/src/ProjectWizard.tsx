@@ -158,6 +158,7 @@ export const ProjectWizard: React.FC<ProjectWizardProps> = ({
   };
 
   const handleCreateProject = async () => {
+    // setLoading(true);
     try {
       const baseUrl = PageConfig.getBaseUrl();
       const token = PageConfig.getToken();
@@ -201,10 +202,13 @@ export const ProjectWizard: React.FC<ProjectWizardProps> = ({
     } catch (error) {
       console.error('Error creating project:', error);
       alert('Failed to create project. Please try again.');
+    } finally {
+      // setLoading(false);
     }
   };
 
   const handleUpdateProject = async () => {
+    // setLoading(true);
     try {
       if (!projectData.id.trim()) {
         alert('Project ID missing. Load a project first.');
@@ -255,6 +259,8 @@ export const ProjectWizard: React.FC<ProjectWizardProps> = ({
     } catch (error) {
       console.error('Error updating project:', error);
       alert('Failed to update project. Please try again.');
+    } finally {
+      // setLoading(false);
     }
   };
 
@@ -669,7 +675,46 @@ export const ProjectWizard: React.FC<ProjectWizardProps> = ({
   };
 
   return (
-    <div style={{ padding: '40px', minHeight: '100vh', background: '#f8f9fa' }}>
+    <div style={{ padding: '40px', minHeight: '100vh', background: '#f8f9fa', position: 'relative' }}>
+      {/* Loading Overlay */}
+      {loading && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999
+        }}>
+          <div style={{
+            background: 'white',
+            padding: '40px',
+            borderRadius: '12px',
+            textAlign: 'center',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)'
+          }}>
+            <div style={{
+              width: '40px',
+              height: '40px',
+              border: '4px solid #f3f3f3',
+              borderTop: '4px solid #667eea',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+              margin: '0 auto 20px auto'
+            }}></div>
+            <h3 style={{ margin: '0 0 10px 0', color: '#333' }}>
+              {isModifyMode ? 'Updating Project...' : 'Creating Project...'}
+            </h3>
+            <p style={{ margin: '0', color: '#666' }}>
+              Please wait while we process your request
+            </p>
+          </div>
+        </div>
+      )}
       {/* Progress Bar */}
       <div style={{ maxWidth: '600px', margin: '0 auto 40px auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
@@ -745,17 +790,19 @@ export const ProjectWizard: React.FC<ProjectWizardProps> = ({
           ) : (
             <button
               onClick={handleSubmit}
+              disabled={loading}
               style={{
                 padding: '12px 24px',
-                background: '#28a745',
+                background: loading ? '#ccc' : '#28a745',
                 color: 'white',
                 border: 'none',
                 borderRadius: '8px',
-                cursor: 'pointer',
-                fontSize: '16px'
+                cursor: loading ? 'not-allowed' : 'pointer',
+                fontSize: '16px',
+                opacity: loading ? 0.7 : 1
               }}
             >
-              {getButtonText()}
+              {loading ? 'Processing...' : getButtonText()}
             </button>
           )}
         </div>

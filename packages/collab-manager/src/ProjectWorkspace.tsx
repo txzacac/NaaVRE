@@ -9,6 +9,57 @@ interface ProjectWorkspaceProps {
 }
 
 export const ProjectWorkspace: React.FC<ProjectWorkspaceProps> = ({ project, onBack, onModuleClick }) => {
+  // Define which modules are under construction
+  const modulesUnderConstruction = new Set([
+    // Ideation & Planning
+    'ideaBoard',
+    'clustering',
+    'voting',
+    'goalNegotiation',
+    'teamRoles',
+    'phaseStruct',
+    
+    // Collaboration & Content Co-production
+    'realtimeCoedit',
+    'chat',
+    'sharedGlossary',
+    'onboardingDocs',
+    'fileShare',
+    'gitIntegration',
+    // Note: 'videoMeet' is removed because it's now functional
+    
+    // Workflow Tracking & Task Coordination
+    'taskBoard',
+    'workflowMap',
+    'sprint',
+    'liveProgress',
+    'scopedWorkspaces',
+    'crossGroupDash',
+    'integrationSchedule',
+    'taskReassign',
+    
+    // Review & Feedback
+    'inlineComment',
+    'versionThread',
+    'activityFeed',
+    'contribAttribution',
+    
+    // Finalization & Dissemination
+    'metadataTemplates',
+    'auditTrails',
+    'projectOverview',
+    'openDataSharing',
+    'visualizationDashboard',
+    'provenanceExplorer',
+    
+    // Cross-phase Infrastructure
+    'rolePermission',
+    'accessControl',
+    'referenceManager',
+    'searchDiscovery',
+    'workflowBuilder'
+  ]);
+
   const getPhaseModules = (phaseId: string) => {
     const phase = PHASES.find(p => p.id === phaseId);
     return phase ? phase.modules.filter(m => project.modules.includes(m.id)) : [];
@@ -139,19 +190,21 @@ export const ProjectWorkspace: React.FC<ProjectWorkspaceProps> = ({ project, onB
                       e.currentTarget.style.borderColor = '#ddd';
                     }}
                   >
-                    <div style={{ 
-                      position: 'absolute', 
-                      top: '10px', 
-                      right: '10px',
-                      background: '#ffc107',
-                      color: '#333',
-                      padding: '4px 8px',
-                      borderRadius: '12px',
-                      fontSize: '10px',
-                      fontWeight: 'bold'
-                    }}>
-                      UNDER CONSTRUCTION
-                    </div>
+                    {modulesUnderConstruction.has(module.id) && (
+                      <div style={{ 
+                        position: 'absolute', 
+                        top: '10px', 
+                        right: '10px',
+                        background: '#ffc107',
+                        color: '#333',
+                        padding: '4px 8px',
+                        borderRadius: '12px',
+                        fontSize: '10px',
+                        fontWeight: 'bold'
+                      }}>
+                        UNDER CONSTRUCTION
+                      </div>
+                    )}
                     
                     <h3 style={{ 
                       margin: '0 0 10px 0', 
