@@ -22,7 +22,23 @@ import { Commands, CommandIDs } from './commands';
   
   /**
    * Initialization data for the @jupyter_vre/collab-manager extension.
-   */
+ 
+    index.ts (entry point)
+        ↓
+    commands.ts (register commands)
+        ↓
+    widget.tsx (main controller)
+        ↓
+    MainPage.tsx (main UI)
+        ↓ (user clicks)
+    widget.tsx (state changes)
+        ↓ (re-render)
+    ProjectWizard.tsx (project wizard)
+        ↓ (based on the mode parameter)
+    Different UI steps
+    
+  */
+
   // an app 
   const plugin: JupyterFrontEndPlugin<void> = {
     id: '@jupyter_vre/collab-manager:extension',

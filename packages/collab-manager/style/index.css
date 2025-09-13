@@ -52,3 +52,15 @@
 .lw-big-spacing {
     line-height: 2.5;
 }
+
+/* Collaboration Manager Widget Styles */
+.collab-manager-widget {
+    overflow: auto !important;
+    height: 100%;
+    width: 100%;
+}
+
+.collab-manager-widget .p-Widget {
+    overflow: auto !important;
+    height: 100%;
+}
