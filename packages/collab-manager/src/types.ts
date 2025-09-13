@@ -72,8 +72,8 @@ export const PHASES: Phase[] = [
     description: 'Comments, version tracking, and contribution attribution',
     modules: [
       { id: 'inlineComment', name: 'Inline Comments', description: 'Context-aware inline comments in docs or notebooks', phase: 'review-feedback' },
-      { id: 'versionThread', name: 'Version Thread', description: 'Version tracking with threaded discussions', phase: 'review-feedback' },
-      { id: 'activityFeed', name: 'Activity Feed', description: 'Live feed showing document edits and task updates', phase: 'review-feedback' },
+      { id: 'versionThread', name: 'Version Thread', description: 'Version Thread – Manage document/code versions with discussion threads linked to each change', phase: 'review-feedback' },
+      { id: 'activityFeed', name: 'Activity Feed', description: 'Activity Feed – Real-time stream of edits, task changes, and team updates', phase: 'review-feedback' },
       { id: 'contribAttribution', name: 'Contribution Attribution', description: 'Tagging contributions for accountability and recognition', phase: 'review-feedback' }
     ]
   },
