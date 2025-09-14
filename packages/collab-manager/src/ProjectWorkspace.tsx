@@ -42,6 +42,7 @@ export const ProjectWorkspace: React.FC<ProjectWorkspaceProps> = ({ project, onB
     'versionThread',
     'activityFeed',
     'contribAttribution',
+    'retrospectiveTools',
     
     // Finalization & Dissemination
     'metadataTemplates',
@@ -50,11 +51,14 @@ export const ProjectWorkspace: React.FC<ProjectWorkspaceProps> = ({ project, onB
     'openDataSharing',
     'visualizationDashboard',
     'provenanceExplorer',
+    'approvalGates',
     
     // Cross-phase Infrastructure
     'rolePermission',
     'accessControl',
-    'referenceManager'
+    'referenceManager',
+    'dataLifecycleManagement',
+    'aiAssistant'
     // Note: 'notebookSearch', 'datasetSearch', 'workflowBuilder', 'componentContainerizer' are removed because they're now functional
   ]);
 

@@ -75,7 +75,8 @@ export const PHASES: Phase[] = [
       { id: 'inlineComment', name: 'Inline Comments', description: 'Context-aware inline comments in docs or notebooks', phase: 'review-feedback' },
       { id: 'versionThread', name: 'Version Thread', description: 'Version Thread – Manage document/code versions with discussion threads linked to each change', phase: 'review-feedback' },
       { id: 'activityFeed', name: 'Activity Feed', description: 'Activity Feed – Real-time stream of edits, task changes, and team updates', phase: 'review-feedback' },
-      { id: 'contribAttribution', name: 'Contribution Attribution', description: 'Tagging contributions for accountability and recognition', phase: 'review-feedback' }
+      { id: 'contribAttribution', name: 'Contribution Attribution', description: 'Tagging contributions for accountability and recognition', phase: 'review-feedback' },
+      { id: 'retrospectiveTools', name: 'Retrospective Tools', description: 'Tools for team reflection at the end of a project phase (similar to Agile retrospectives), helping identify strengths, weaknesses, and improvements for the next cycle', phase: 'review-feedback' }
     ]
   },
   {
@@ -88,8 +89,14 @@ export const PHASES: Phase[] = [
       { id: 'projectOverview', name: 'Project Overview', description: 'Centralized overview of goals, timelines, and deliverables', phase: 'dissemination-finalization' },
       { id: 'openDataSharing', name: 'Open Data Sharing', description: 'Publish datasets, code, and papers with DOI integration', phase: 'dissemination-finalization' },
       { id: 'visualizationDashboard', name: 'Visualization & Dashboard', description: 'Built-in plotting and analytical dashboards', phase: 'dissemination-finalization' },
-      { id: 'provenanceExplorer', name: 'Provenance Explorer', description: 'Tool that shows the full history of a result, from raw data to final output', phase: 'dissemination-finalization' }
-    ]
+      { id: 'provenanceExplorer', name: 'Provenance Explorer', description: 'Tool that shows the full history of a result, from raw data to final output', phase: 'dissemination-finalization' },
+      { 
+        id: 'approvalGates', 
+        name: 'Approval Gates', 
+        description: 'Tools that define and enforce checkpoints within workflows, requiring validation and approval before results advance to the next stage, ensuring quality control and accountability.', 
+        phase: 'dissemination-finalization' 
+      }
+      ]
   },
   {
     id: 'cross-phase-infrastructure',
@@ -102,7 +109,21 @@ export const PHASES: Phase[] = [
       { id: 'notebookSearch', name: 'Notebook Search', description: 'Search and discover notebooks across projects', phase: 'cross-phase-infrastructure' },
       { id: 'datasetSearch', name: 'Dataset Search', description: 'Search and discover datasets across projects', phase: 'cross-phase-infrastructure' },
       { id: 'workflowBuilder', name: 'Workflow Builder', description: 'Build and package experimental workflows with Docker/Conda for scalable and reproducible execution', phase: 'cross-phase-infrastructure' },
-      { id: 'componentContainerizer', name: 'Component Containerizer', description: 'Containerize and package components for reproducible workflows', phase: 'cross-phase-infrastructure' }
-    ]
+      { id: 'componentContainerizer', name: 'Component Containerizer', description: 'Containerize and package components for reproducible workflows', phase: 'cross-phase-infrastructure' },
+      
+      { 
+        id: 'dataLifecycleManagement', 
+        name: 'Data Lifecycle Management', 
+        description: 'Provides long-term stewardship of research data, including archiving policies, retention monitoring, and controlled transitions across storage stages to ensure sustainability and compliance.', 
+        phase: 'cross-phase-infrastructure' 
+      },
+      
+      { 
+        id: 'aiAssistant', 
+        name: 'AI Assistant', 
+        description: 'An intelligent tool embedded across phases, offering context-aware support such as literature discovery, knowledge summarization, and workflow guidance to augment research productivity.', 
+        phase: 'cross-phase-infrastructure' 
+      }
+         ]
   }
 ];
