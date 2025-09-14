@@ -22,11 +22,8 @@ export const ProjectWorkspace: React.FC<ProjectWorkspaceProps> = ({ project, onB
     // Collaboration & Content Co-production
     'realtimeCoedit',
     'chat',
-    'sharedGlossary',
     'onboardingDocs',
-    'fileShare',
-    'gitIntegration',
-    // Note: 'videoMeet' is removed because it's now functional
+    // Note: 'videoMeet', 'sharedGlossary', 'fileShare', 'gitIntegration', 'githubIntegration' are removed because they're now functional
     
     // Workflow Tracking & Task Coordination
     'taskBoard',
@@ -55,9 +52,8 @@ export const ProjectWorkspace: React.FC<ProjectWorkspaceProps> = ({ project, onB
     // Cross-phase Infrastructure
     'rolePermission',
     'accessControl',
-    'referenceManager',
-    'searchDiscovery',
-    'workflowBuilder'
+    'referenceManager'
+    // Note: 'notebookSearch', 'datasetSearch', 'workflowBuilder', 'componentContainerizer' are removed because they're now functional
   ]);
 
   const getPhaseModules = (phaseId: string) => {

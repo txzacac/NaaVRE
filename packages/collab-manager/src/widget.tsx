@@ -161,56 +161,107 @@ export class CollabManagerWidget extends Widget {
         alert('Chat feature is coming soon!');
         break;
       case 'sharedGlossary':
-        // Shared glossary - can open a placeholder page
-        alert('Shared Glossary feature is coming soon!');
+        // Shared glossary - open Knowledge Repo
+        try {
+          this.app.commands.execute('knowledge-repo:open');
+        } catch (error) {
+          console.error('Failed to open Knowledge Repo:', error);
+          // Fallback: try alternative command names
+          try {
+            this.app.commands.execute('knowledge-repo:launch');
+          } catch (error2) {
+            console.error('Failed to open Knowledge Repo with alternative command:', error2);
+            alert('Knowledge Repo feature is not available. Please check if the extension is properly installed.');
+          }
+        }
         break;
       case 'onboardingDocs':
         // Onboarding docs - can open a placeholder page
         alert('Onboarding Docs feature is coming soon!');
         break;
       case 'fileShare':
-        // File sharing - can open file browser
-        this.app.commands.execute('filebrowser:open');
+        // File sharing - open File Browser widget
+        try {
+          // Try to activate the file browser widget by ID
+          this.app.shell.activateById('filebrowser');
+        } catch (error) {
+          console.error('Failed to open File Browser:', error);
+          // Fallback: try alternative widget IDs
+          try {
+            this.app.shell.activateById('jp-property-inspector');
+          } catch (error2) {
+            console.error('Failed to open File Browser with alternative ID:', error2);
+            alert('File Browser feature is not available. Please check if the extension is properly installed.');
+          }
+        }
         break;
       case 'gitIntegration':
-        // Git integration - can open file browser
-        this.app.commands.execute('filebrowser:open');
+        // Git integration - open Git widget
+        try {
+          // Try to activate the git widget by ID
+          this.app.shell.activateById('jp-git-sessions');
+        } catch (error) {
+          console.error('Failed to open Git extension:', error);
+          // Fallback: try alternative widget IDs
+          try {
+            this.app.shell.activateById('git-sessions');
+          } catch (error2) {
+            console.error('Failed to open Git with alternative ID:', error2);
+            alert('Git extension is not available. Please check if jupyterlab-git is properly installed.');
+          }
+        }
+        break;
+      case 'githubIntegration':
+        // GitHub integration - open GitHub widget
+        try {
+          // Try to activate the GitHub widget by ID
+          this.app.shell.activateById('github-file-browser');
+        } catch (error) {
+          console.error('Failed to open GitHub extension:', error);
+          // Fallback: try alternative widget IDs
+          // try {
+          //   this.app.shell.activateById('github-panel');
+          // } catch (error2) {
+          //   console.error('Failed to open GitHub with alternative ID:', error2);
+          //   alert('GitHub extension is not available. Please check if jupyterlab-github is properly installed.');
+          // }
+        }
         break;
       case 'taskBoard':
         // Task board - can open experiment manager
-        this.app.commands.execute('create-vre-composer');
+        alert('This feature is coming soon!');
         break;
       case 'workflowMap':
         // Workflow map - can open experiment manager
-        this.app.commands.execute('create-vre-composer');
+        alert('This feature is coming soon!');
         break;
       case 'sprint':
         // Sprint management - can open experiment manager
-        this.app.commands.execute('create-vre-composer');
+        alert('This feature is coming soon!');
         break;
       case 'liveProgress':
         // Live progress - can open experiment manager
-        this.app.commands.execute('create-vre-composer');
+        alert('This feature is coming soon!');
         break;
       case 'phaseStruct':
         // Phase structure - can open experiment manager
-        this.app.commands.execute('create-vre-composer');
+        alert('This feature is coming soon!');
         break;
       case 'scopedWorkspaces':
         // Scoped workspaces - can open file browser
-        this.app.commands.execute('filebrowser:open');
+        alert('This feature is coming soon!');
         break;
       case 'crossGroupDash':
         // Cross-group dashboard - can open experiment manager
-        this.app.commands.execute('create-vre-composer');
+        alert('This feature is coming soon!');
         break;
       case 'integrationSchedule':
         // Integration schedule - can open experiment manager
-        this.app.commands.execute('create-vre-composer');
+        alert('This feature is coming soon!');
         break;
       case 'taskReassign':
         // Task reassignment - can open experiment manager
-        this.app.commands.execute('create-vre-composer');
+        alert('This feature is coming soon!');
         break;
       case 'inlineComment':
         // Inline comments - can open a placeholder page
@@ -268,13 +319,58 @@ export class CollabManagerWidget extends Widget {
         // Reference manager - can open a placeholder page
         alert('Reference Manager feature is coming soon!');
         break;
-      case 'searchDiscovery':
-        // Search discovery - can open a placeholder page
-        alert('Search & Discovery feature is coming soon!');
+      case 'notebookSearch':
+        // Notebook search - open notebook search widget
+        try {
+          // Try to activate the notebook search widget by ID
+          const notebookSearchId = 'lifewatch/notebook-search';
+          this.app.shell.activateById(notebookSearchId);
+        } catch (error) {
+          console.error('Failed to open Notebook Search:', error);
+          // Fallback: try alternative widget IDs
+          try {
+            this.app.shell.activateById('notebook-search');
+          } catch (error2) {
+            console.error('Failed to open Notebook Search with alternative ID:', error2);
+            alert('Notebook Search feature is not available. Please check if the extension is properly installed.');
+          }
+        }
+        break;
+      case 'datasetSearch':
+        // Dataset search - open dataset search widget
+        try {
+          // Try to activate the dataset search widget by ID
+          this.app.shell.activateById('lifewatch/dataset-search');
+        } catch (error) {
+          console.error('Failed to open Dataset Search:', error);
+          // Fallback: try alternative widget IDs
+          try {
+            this.app.shell.activateById('dataset-search');
+          } catch (error2) {
+            console.error('Failed to open Dataset Search with alternative ID:', error2);
+            alert('Dataset Search feature is not available. Please check if the extension is properly installed.');
+          }
+        }
         break;
       case 'workflowBuilder':
         // Workflow builder - can open experiment manager
         this.app.commands.execute('create-vre-composer');
+        break;
+      case 'componentContainerizer':
+        // Component containerizer - open component containerizer widget
+        try {
+          // Try to activate the component containerizer widget by ID
+          this.app.shell.activateById('lifewatch/panel');
+        } catch (error) {
+          console.error('Failed to open Component Containerizer:', error);
+          // Fallback: try alternative widget IDs
+          try {
+            this.app.shell.activateById('containerizer');
+          } catch (error2) {
+            console.error('Failed to open Component Containerizer with alternative ID:', error2);
+            alert('Component Containerizer feature is not available. Please check if the extension is properly installed.');
+          }
+        }
         break;
       default:
         alert(`Module "${moduleId}" is under construction. This feature will be available soon!`);

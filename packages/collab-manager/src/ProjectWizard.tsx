@@ -163,9 +163,35 @@ export const ProjectWizard: React.FC<ProjectWizardProps> = ({
       const baseUrl = PageConfig.getBaseUrl();
       const token = PageConfig.getToken();
       
-      // Get CSRF token
-      const xsrfToken = document.querySelector('meta[name="_xsrf"]')?.getAttribute('content') ||
-                       document.cookie.split('; ').find(row => row.startsWith('_xsrf='))?.split('=')[1] || '';
+      // Get CSRF token - try multiple methods
+      let xsrfToken = '';
+      try {
+        // Method 1: Try to get from meta tag
+        const metaTag = document.querySelector('meta[name="_xsrf"]');
+        if (metaTag) {
+          xsrfToken = metaTag.getAttribute('content') || '';
+        }
+        
+        // Method 2: Try to get from cookies
+        if (!xsrfToken) {
+          const cookies = document.cookie.split(';');
+          for (const cookie of cookies) {
+            const trimmed = cookie.trim();
+            if (trimmed.startsWith('_xsrf=')) {
+              xsrfToken = trimmed.split('=')[1];
+              break;
+            }
+          }
+        }
+        
+        // Method 3: Try to get from JupyterLab's PageConfig
+        if (!xsrfToken) {
+          // @ts-ignore - PageConfig might have xsrf token
+          xsrfToken = PageConfig.getOption('xsrfToken') || '';
+        }
+      } catch (e) {
+        console.warn('Could not get CSRF token:', e);
+      }
       
       const authHeaders = {
         'Authorization': `token ${token}`,
@@ -218,9 +244,35 @@ export const ProjectWizard: React.FC<ProjectWizardProps> = ({
       const baseUrl = PageConfig.getBaseUrl();
       const token = PageConfig.getToken();
       
-      // Get CSRF token
-      const xsrfToken = document.querySelector('meta[name="_xsrf"]')?.getAttribute('content') ||
-                       document.cookie.split('; ').find(row => row.startsWith('_xsrf='))?.split('=')[1] || '';
+      // Get CSRF token - try multiple methods
+      let xsrfToken = '';
+      try {
+        // Method 1: Try to get from meta tag
+        const metaTag = document.querySelector('meta[name="_xsrf"]');
+        if (metaTag) {
+          xsrfToken = metaTag.getAttribute('content') || '';
+        }
+        
+        // Method 2: Try to get from cookies
+        if (!xsrfToken) {
+          const cookies = document.cookie.split(';');
+          for (const cookie of cookies) {
+            const trimmed = cookie.trim();
+            if (trimmed.startsWith('_xsrf=')) {
+              xsrfToken = trimmed.split('=')[1];
+              break;
+            }
+          }
+        }
+        
+        // Method 3: Try to get from JupyterLab's PageConfig
+        if (!xsrfToken) {
+          // @ts-ignore - PageConfig might have xsrf token
+          xsrfToken = PageConfig.getOption('xsrfToken') || '';
+        }
+      } catch (e) {
+        console.warn('Could not get CSRF token:', e);
+      }
       
       const authHeaders = {
         'Authorization': `token ${token}`,
