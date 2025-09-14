@@ -76,7 +76,7 @@ export const PHASES: Phase[] = [
       { id: 'versionThread', name: 'Version Thread', description: 'Version Thread – Manage document/code versions with discussion threads linked to each change', phase: 'review-feedback' },
       { id: 'activityFeed', name: 'Activity Feed', description: 'Activity Feed – Real-time stream of edits, task changes, and team updates', phase: 'review-feedback' },
       { id: 'contribAttribution', name: 'Contribution Attribution', description: 'Tagging contributions for accountability and recognition', phase: 'review-feedback' },
-      { id: 'retrospectiveTools', name: 'Retrospective Tools', description: 'Tools for team reflection at the end of a project phase (similar to Agile retrospectives), helping identify strengths, weaknesses, and improvements for the next cycle', phase: 'review-feedback' }
+      { id: 'retrospectiveTools', name: 'Retrospective Tools', description: 'Tools that support team reflection at the end of a phase to review progress and plan improvements', phase: 'review-feedback' }
     ]
   },
   {
@@ -93,7 +93,7 @@ export const PHASES: Phase[] = [
       { 
         id: 'approvalGates', 
         name: 'Approval Gates', 
-        description: 'Tools that define and enforce checkpoints within workflows, requiring validation and approval before results advance to the next stage, ensuring quality control and accountability.', 
+        description: 'Tools that set checkpoints in workflows where results must be approved before moving to the next stage', 
         phase: 'dissemination-finalization' 
       }
       ]
@@ -114,14 +114,14 @@ export const PHASES: Phase[] = [
       { 
         id: 'dataLifecycleManagement', 
         name: 'Data Lifecycle Management', 
-        description: 'Provides long-term stewardship of research data, including archiving policies, retention monitoring, and controlled transitions across storage stages to ensure sustainability and compliance.', 
+        description: 'Tools that manage research data through its full lifecycle, including retention reminders, archiving, and long-term storage to ensure sustainability and compliance.', 
         phase: 'cross-phase-infrastructure' 
       },
       
       { 
         id: 'aiAssistant', 
         name: 'AI Assistant', 
-        description: 'An intelligent tool embedded across phases, offering context-aware support such as literature discovery, knowledge summarization, and workflow guidance to augment research productivity.', 
+        description: 'Tools that provide smart support across all phases, suggesting literature, summarizing content, and guiding workflows to boost research productivity.', 
         phase: 'cross-phase-infrastructure' 
       }
          ]
