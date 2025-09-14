@@ -23,7 +23,9 @@ export const ProjectWorkspace: React.FC<ProjectWorkspaceProps> = ({ project, onB
     'realtimeCoedit',
     'chat',
     'onboardingDocs',
-    // Note: 'videoMeet', 'sharedGlossary', 'fileShare', 'gitIntegration', 'githubIntegration' are removed because they're now functional
+    'sharedGlossary',
+
+    // Note: 'videoMeet' , 'fileShare', 'gitIntegration', 'githubIntegration' are removed because they're now functional
     
     // Workflow Tracking & Task Coordination
     'taskBoard',

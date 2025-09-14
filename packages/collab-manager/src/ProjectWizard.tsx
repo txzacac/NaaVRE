@@ -20,7 +20,7 @@ export const ProjectWizard: React.FC<ProjectWizardProps> = ({
 }) => {
   const [step, setStep] = useState(1);
   const [projectId, setProjectId] = useState(initialProjectId || '');
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
   const [projectData, setProjectData] = useState({
     id: '',
     name: '',
@@ -107,7 +107,10 @@ export const ProjectWizard: React.FC<ProjectWizardProps> = ({
       return;
     }
 
-    setLoading(true);
+    // setLoading(true);
+    // const startTime = Date.now();
+    // const minLoadingTime = 1500; // 1.5 seconds minimum loading time for loading project
+    
     try {
       const baseUrl = PageConfig.getBaseUrl();
       const token = PageConfig.getToken();
@@ -153,12 +156,15 @@ export const ProjectWizard: React.FC<ProjectWizardProps> = ({
       console.error('Error loading project:', error);
       alert('Failed to load project. Please check the Project ID and try again.');
     } finally {
-      setLoading(false);
+      // setLoading(false);
     }
   };
 
   const handleCreateProject = async () => {
     // setLoading(true);
+    // const startTime = Date.now();
+    // const minLoadingTime = 2000; // 2 seconds minimum loading time
+    
     try {
       const baseUrl = PageConfig.getBaseUrl();
       const token = PageConfig.getToken();
@@ -189,6 +195,8 @@ export const ProjectWizard: React.FC<ProjectWizardProps> = ({
           // @ts-ignore - PageConfig might have xsrf token
           xsrfToken = PageConfig.getOption('xsrfToken') || '';
         }
+        
+        console.log('CSRF Token obtained:', xsrfToken ? 'Yes' : 'No');
       } catch (e) {
         console.warn('Could not get CSRF token:', e);
       }
@@ -235,6 +243,9 @@ export const ProjectWizard: React.FC<ProjectWizardProps> = ({
 
   const handleUpdateProject = async () => {
     // setLoading(true);
+    // const startTime = Date.now();
+    // const minLoadingTime = 2000; // 2 seconds minimum loading time
+    
     try {
       if (!projectData.id.trim()) {
         alert('Project ID missing. Load a project first.');
@@ -270,6 +281,8 @@ export const ProjectWizard: React.FC<ProjectWizardProps> = ({
           // @ts-ignore - PageConfig might have xsrf token
           xsrfToken = PageConfig.getOption('xsrfToken') || '';
         }
+        
+        console.log('CSRF Token obtained:', xsrfToken ? 'Yes' : 'No');
       } catch (e) {
         console.warn('Could not get CSRF token:', e);
       }
@@ -360,19 +373,19 @@ export const ProjectWizard: React.FC<ProjectWizardProps> = ({
         </button>
         <button
           onClick={loadProject}
-          disabled={!projectId.trim() || loading}
+          disabled={!projectId.trim()}
           style={{
             flex: 1,
             padding: '12px 24px',
-            background: !projectId.trim() || loading ? '#ccc' : '#667eea',
+            background: !projectId.trim() ? '#ccc' : '#667eea',
             color: 'white',
             border: 'none',
             borderRadius: '8px',
-            cursor: !projectId.trim() || loading ? 'not-allowed' : 'pointer',
+            cursor: !projectId.trim() ? 'not-allowed' : 'pointer',
             fontSize: '16px'
           }}
         >
-          {loading ? 'Loading...' : 'Load Project'}
+          Load Project
         </button>
       </div>
 
@@ -729,44 +742,7 @@ export const ProjectWizard: React.FC<ProjectWizardProps> = ({
   return (
     <div style={{ padding: '40px', minHeight: '100vh', background: '#f8f9fa', position: 'relative' }}>
       {/* Loading Overlay */}
-      {loading && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(0, 0, 0, 0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 9999
-        }}>
-          <div style={{
-            background: 'white',
-            padding: '40px',
-            borderRadius: '12px',
-            textAlign: 'center',
-            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)'
-          }}>
-            <div style={{
-              width: '40px',
-              height: '40px',
-              border: '4px solid #f3f3f3',
-              borderTop: '4px solid #667eea',
-              borderRadius: '50%',
-              animation: 'spin 1s linear infinite',
-              margin: '0 auto 20px auto'
-            }}></div>
-            <h3 style={{ margin: '0 0 10px 0', color: '#333' }}>
-              {isModifyMode ? 'Updating Project...' : 'Creating Project...'}
-            </h3>
-            <p style={{ margin: '0', color: '#666' }}>
-              Please wait while we process your request
-            </p>
-          </div>
-        </div>
-      )}
+      {/* Loading overlay removed */}
       {/* Progress Bar */}
       <div style={{ maxWidth: '600px', margin: '0 auto 40px auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
@@ -842,19 +818,19 @@ export const ProjectWizard: React.FC<ProjectWizardProps> = ({
           ) : (
             <button
               onClick={handleSubmit}
-              disabled={loading}
+              disabled={false}
               style={{
                 padding: '12px 24px',
-                background: loading ? '#ccc' : '#28a745',
+                background: '#28a745',
                 color: 'white',
                 border: 'none',
                 borderRadius: '8px',
-                cursor: loading ? 'not-allowed' : 'pointer',
+                cursor: 'pointer',
                 fontSize: '16px',
-                opacity: loading ? 0.7 : 1
+                opacity: 1
               }}
             >
-              {loading ? 'Processing...' : getButtonText()}
+              {getButtonText()}
             </button>
           )}
         </div>

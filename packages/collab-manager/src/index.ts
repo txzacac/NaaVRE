@@ -36,7 +36,7 @@ import { Commands, CommandIDs } from './commands';
     ProjectWizard.tsx (project wizard)
         ↓ (based on the mode parameter)
     Different UI steps
-    
+
   */
 
   // an app 
@@ -47,7 +47,7 @@ import { Commands, CommandIDs } from './commands';
     requires: [ILauncher],
     activate: (app: JupyterFrontEnd, launcher: ILauncher) => {
       console.log('JupyterLab extension collab-manager is activated!');
-      alert('JupyterLab extension collab-manager is activated!2');
+      // alert('JupyterLab extension collab-manager is activated!2');
       
       // invoke the addcommand to show widget in main area with content 
       Commands.addCommands(app); 

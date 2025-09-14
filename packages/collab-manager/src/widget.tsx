@@ -161,19 +161,20 @@ export class CollabManagerWidget extends Widget {
         alert('Chat feature is coming soon!');
         break;
       case 'sharedGlossary':
+        alert('sharedGlossary feature is coming soon!');
         // Shared glossary - open Knowledge Repo
-        try {
-          this.app.commands.execute('knowledge-repo:open');
-        } catch (error) {
-          console.error('Failed to open Knowledge Repo:', error);
-          // Fallback: try alternative command names
-          try {
-            this.app.commands.execute('knowledge-repo:launch');
-          } catch (error2) {
-            console.error('Failed to open Knowledge Repo with alternative command:', error2);
-            alert('Knowledge Repo feature is not available. Please check if the extension is properly installed.');
-          }
-        }
+        // try {
+        //   this.app.commands.execute('knowledge-repo:open');
+        // } catch (error) {
+        //   console.error('Failed to open Knowledge Repo:', error);
+        //   // Fallback: try alternative command names
+        //   try {
+        //     this.app.commands.execute('knowledge-repo:launch');
+        //   } catch (error2) {
+        //     console.error('Failed to open Knowledge Repo with alternative command:', error2);
+        //     alert('Knowledge Repo feature is not available. Please check if the extension is properly installed.');
+        //   }
+        // }
         break;
       case 'onboardingDocs':
         // Onboarding docs - can open a placeholder page

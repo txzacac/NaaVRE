@@ -46,7 +46,7 @@ export const PHASES: Phase[] = [
       { id: 'workflowMap', name: 'Workflow Map', description: 'Visual workflow map showing dependencies and transitions', phase: 'workflow-tracking' },
       { id: 'sprint', name: 'Sprint Planning', description: 'Agile sprint planning and iteration management', phase: 'workflow-tracking' },
       { id: 'liveProgress', name: 'Live Progress', description: 'Real-time progress tracking and priority indicators', phase: 'workflow-tracking' },
-      { id: 'scopedWorkspaces', name: 'Scoped Workspaces', description: 'Dedicated sub-group workspaces for focused collaboration', phase: 'workflow-tracking' },
+      { id: 'scopedWorkspaces', name: 'Scoped Workspaces', description: 'Private sub-group areas within a project for focused collaboration, with role-based access and integration into cross-group dashboards', phase: 'workflow-tracking' },
       { id: 'crossGroupDash', name: 'Cross-group Dashboard', description: 'Integrated dashboard combining multiple team views', phase: 'workflow-tracking' },
       { id: 'integrationSchedule', name: 'Integration Schedule', description: 'Shared calendar and scheduling tools for coordination', phase: 'workflow-tracking' },
       { id: 'taskReassign', name: 'Task Reassignment', description: 'Reassign and reconfigure tasks dynamically', phase: 'workflow-tracking' }
@@ -58,7 +58,7 @@ export const PHASES: Phase[] = [
     description: 'Real-time collaboration, shared glossaries, and content co-production',
     modules: [
       { id: 'realtimeCoedit', name: 'Real-time Co-editing', description: 'Collaborative editing of docs/code (supports Jupyter & manuscripts)', phase: 'collaboration-coproduction' },
-      { id: 'videoMeet', name: 'Video Meeting', description: 'Integrated video conferencing (Zoom/Teams/Jitsi)', phase: 'collaboration-coproduction' },
+      { id: 'videoMeet', name: 'Video Meeting', description: 'Integrated video conferencing', phase: 'collaboration-coproduction' },
       { id: 'chat', name: 'Chat', description: 'Instant messaging channels for quick communication', phase: 'collaboration-coproduction' },
       { id: 'sharedGlossary', name: 'Shared Glossary', description: 'Central glossary to align terminology across disciplines', phase: 'collaboration-coproduction' },
       { id: 'onboardingDocs', name: 'Onboarding Docs', description: 'Documents to help new members integrate quickly', phase: 'collaboration-coproduction' },
