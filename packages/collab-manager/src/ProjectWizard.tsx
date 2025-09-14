@@ -228,7 +228,21 @@ export const ProjectWizard: React.FC<ProjectWizardProps> = ({
       const result = await response.json();
       
       if (result.success) {
-        alert(`Project created successfully! \n Project ID: ${result.project.id}`);
+        // Create a custom success message with copy functionality
+        const projectId = result.project.id;
+        const successMessage = `🎉 Project created successfully!\n\nYour Project ID is:\n${projectId}\n\nTip: Share this ID with collaborators to join your project.`;
+        
+        // Try to copy to clipboard
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(projectId).then(() => {
+            alert(`${successMessage}\n\n✅ Project ID copied to clipboard!`);
+          }).catch(() => {
+            alert(successMessage);
+          });
+        } else {
+          alert(successMessage);
+        }
+        
         onProjectCreated?.(result.project);
       } else {
         alert(`Failed to create project: ${result.error}`);
@@ -316,7 +330,21 @@ export const ProjectWizard: React.FC<ProjectWizardProps> = ({
       const result = await response.json();
       
       if (result.success) {
-        alert('Project updated successfully!');
+        // Create a custom success message with copy functionality
+        const projectId = result.project.id;
+        const successMessage = `✅ Project updated successfully!\n\nYour Project ID is:\n${projectId}\n\nTip: Share this ID with collaborators to join your project.`;
+        
+        // Try to copy to clipboard
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(projectId).then(() => {
+            alert(`${successMessage}\n\n✅ Project ID copied to clipboard!`);
+          }).catch(() => {
+            alert(successMessage);
+          });
+        } else {
+          alert(successMessage);
+        }
+        
         onProjectModified?.(result.project);
       } else {
         alert(`Failed to update project: ${result.error}`);

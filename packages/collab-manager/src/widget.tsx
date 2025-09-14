@@ -122,20 +122,20 @@ export class CollabManagerWidget extends Widget {
     switch (moduleId) {
       case 'ideaBoard':
         // Navigate to experiment manager
-        this.app.commands.execute('create-vre-composer');
+        alert('This feature is coming soon!');
         break;
       case 'clustering':
         // Can navigate to other widgets
-        this.app.commands.execute('create-vre-composer');
+        alert('This feature is coming soon!');
         break;
       case 'voting':
-        this.app.commands.execute('create-vre-composer');
+        alert('This feature is coming soon!');
         break;
       case 'goalNegotiation':
-        this.app.commands.execute('create-vre-composer');
+        alert('This feature is coming soon!');
         break;
       case 'teamRoles':
-        this.app.commands.execute('create-vre-composer');
+        alert('This feature is coming soon!');
         break;
       case 'realtimeCoedit':
         // Real-time collaborative editing - can open a new notebook
@@ -282,7 +282,7 @@ export class CollabManagerWidget extends Widget {
         break;
       case 'projectOverview':
         // Project overview - can open experiment manager
-        this.app.commands.execute('create-vre-composer');
+        alert('This feature is coming soon!');
         break;
       case 'exportReport':
         // Export report - can open a placeholder page
@@ -302,7 +302,7 @@ export class CollabManagerWidget extends Widget {
         break;
       case 'visualizationDashboard':
         // Visualization dashboard - can open experiment manager
-        this.app.commands.execute('create-vre-composer');
+        alert('This feature is coming soon!');
         break;
       case 'provenanceExplorer':
         // Provenance explorer - can open a placeholder page
