@@ -31,6 +31,7 @@ export const ProjectWizard: React.FC<ProjectWizardProps> = ({
     modules: [] as string[]
   });
   const [newTag, setNewTag] = useState('');
+  const [moduleSearchTerm, setModuleSearchTerm] = useState('');
 
   // Calculate total steps
   const totalSteps = mode === 'create' ? 3 : 4;
@@ -615,6 +616,18 @@ export const ProjectWizard: React.FC<ProjectWizardProps> = ({
     const allSelected = allAvailableModules.length > 0 && 
       allAvailableModules.every(moduleId => projectData.modules.includes(moduleId));
     
+    // Filter modules based on search term
+    const filteredPhases = PHASES
+      .filter(phase => projectData.phases.includes(phase.id))
+      .map(phase => ({
+        ...phase,
+        modules: phase.modules.filter(module => 
+          module.name.toLowerCase().includes(moduleSearchTerm.toLowerCase()) ||
+          module.description.toLowerCase().includes(moduleSearchTerm.toLowerCase())
+        )
+      }))
+      .filter(phase => phase.modules.length > 0);
+    
     return (
       <div style={{ maxWidth: '900px', margin: '0 auto' }}>
         <h2 style={{ textAlign: 'center', marginBottom: '30px', color: '#333' }}>
@@ -623,6 +636,49 @@ export const ProjectWizard: React.FC<ProjectWizardProps> = ({
         <p style={{ textAlign: 'center', color: '#666', marginBottom: '30px' }}>
           Choose the specific modules you want to enable for each selected phase
         </p>
+        
+        {/* Search Box */}
+        <div style={{ marginBottom: '30px' }}>
+          <div style={{ position: 'relative', maxWidth: '500px', margin: '0 auto' }}>
+            <input
+              type="text"
+              value={moduleSearchTerm}
+              onChange={(e) => setModuleSearchTerm(e.target.value)}
+              placeholder="Search modules by name or description..."
+              style={{
+                width: '100%',
+                padding: '12px 40px 12px 16px',
+                border: '2px solid #ddd',
+                borderRadius: '25px',
+                fontSize: '16px',
+                outline: 'none',
+                transition: 'border-color 0.3s ease'
+              }}
+              onFocus={(e) => e.target.style.borderColor = '#667eea'}
+              onBlur={(e) => e.target.style.borderColor = '#ddd'}
+            />
+            <div style={{
+              position: 'absolute',
+              right: '12px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              color: '#666',
+              fontSize: '18px'
+            }}>
+              🔍
+            </div>
+          </div>
+          {moduleSearchTerm && (
+            <div style={{ 
+              textAlign: 'center', 
+              marginTop: '10px', 
+              color: '#666', 
+              fontSize: '14px' 
+            }}>
+              Found {filteredPhases.reduce((total, phase) => total + phase.modules.length, 0)} module(s) matching "{moduleSearchTerm}"
+            </div>
+          )}
+        </div>
         
         {/* Select All / Deselect All buttons */}
         <div style={{ 
@@ -668,7 +724,7 @@ export const ProjectWizard: React.FC<ProjectWizardProps> = ({
         </div>
         
         <div style={{ display: 'grid', gap: '30px' }}>
-        {PHASES.filter(phase => projectData.phases.includes(phase.id)).map(phase => (
+        {filteredPhases.map(phase => (
           <div key={phase.id} style={{ border: '1px solid #ddd', borderRadius: '12px', padding: '20px' }}>
             <h3 style={{ margin: '0 0 15px 0', color: '#333', borderBottom: '2px solid #667eea', paddingBottom: '10px' }}>
               {phase.name}
@@ -709,6 +765,24 @@ export const ProjectWizard: React.FC<ProjectWizardProps> = ({
           </div>
         ))}
         </div>
+        
+        {/* No results message */}
+        {moduleSearchTerm && filteredPhases.length === 0 && (
+          <div style={{ 
+            textAlign: 'center', 
+            padding: '40px', 
+            color: '#666',
+            background: '#f8f9fa',
+            borderRadius: '12px',
+            border: '1px solid #e9ecef'
+          }}>
+            <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔍</div>
+            <h3 style={{ margin: '0 0 8px 0', color: '#333' }}>No modules found</h3>
+            <p style={{ margin: 0, fontSize: '14px' }}>
+              No modules match your search for "{moduleSearchTerm}". Try a different search term.
+            </p>
+          </div>
+        )}
       </div>
     );
   };
