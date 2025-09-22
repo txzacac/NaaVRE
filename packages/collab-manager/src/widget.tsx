@@ -8,9 +8,10 @@ import { MainPage } from './MainPage';
 import { ProjectWizard } from './ProjectWizard';
 import { JoinProject } from './JoinProject';
 import { ProjectWorkspace } from './ProjectWorkspace';
+import { TaskBoard } from './TaskBoard';
 import { ProjectConfig } from './types';
 
-type ViewType = 'main' | 'create' | 'join' | 'modify' | 'workspace';
+type ViewType = 'main' | 'create' | 'join' | 'modify' | 'workspace' | 'taskboard';
 
 export class CollabManagerWidget extends Widget {
   private currentView: ViewType = 'main';
@@ -75,6 +76,16 @@ export class CollabManagerWidget extends Widget {
           content = React.createElement('div', { style: { padding: '20px' } }, 'No project selected');
         }
         break;
+      case 'taskboard':
+        if (this.currentProject) {
+          content = React.createElement(TaskBoard, {
+            projectId: this.currentProject.id,
+            onBack: () => this.showWorkspace(this.currentProject!)
+          });
+        } else {
+          content = React.createElement('div', { style: { padding: '20px' } }, 'No project selected');
+        }
+        break;
       default:
         content = React.createElement('div', { style: { padding: '20px' } }, 'Unknown view');
     }
@@ -108,6 +119,12 @@ export class CollabManagerWidget extends Widget {
 
   private showWorkspace(project: ProjectConfig) {
     this.currentView = 'workspace';
+    this.currentProject = project;
+    this.render();
+  }
+
+  private showTaskBoard(project: ProjectConfig) {
+    this.currentView = 'taskboard';
     this.currentProject = project;
     this.render();
   }
@@ -229,8 +246,12 @@ export class CollabManagerWidget extends Widget {
         }
         break;
       case 'taskBoard':
-        // Task board - can open experiment manager
-        alert('This feature is coming soon!');
+        // Task board - open Task Board interface
+        if (this.currentProject) {
+          this.showTaskBoard(this.currentProject);
+        } else {
+          alert('No project selected. Please create or join a project first.');
+        }
         break;
       case 'workflowMap':
         // Workflow map - can open experiment manager

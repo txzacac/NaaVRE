@@ -23,6 +23,60 @@ export interface Module {
   phase: string;
 }
 
+// Task Board related types
+export interface Task {
+  id: string;
+  title: string;
+  description?: string;
+  status: TaskStatus;
+  assignee?: string;
+  collaborators?: string[];
+  priority: TaskPriority;
+  dueDate?: string;
+  createdAt: string;
+  updatedAt: string;
+  tags: string[];
+  projectId: string;
+  attachments?: TaskAttachment[];
+  links?: TaskLink[];
+}
+
+export interface TaskAttachment {
+  id: string;
+  name: string;
+  type: string;
+  size: number;
+  url: string;
+  uploadedAt: string;
+  uploadedBy: string;
+}
+
+export interface TaskLink {
+  id: string;
+  title: string;
+  url: string;
+  type: 'document' | 'code' | 'image' | 'other';
+  addedAt: string;
+  addedBy: string;
+}
+
+export type TaskStatus = 'todo' | 'in-progress' | 'review' | 'done';
+
+export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent';
+
+export interface TaskColumn {
+  id: TaskStatus;
+  title: string;
+  tasks: Task[];
+  color: string;
+}
+
+export interface TaskBoardData {
+  projectId: string;
+  columns: TaskColumn[];
+  lastUpdated: string;
+}
+
 export const PHASES: Phase[] = [
   {
     id: 'ideation-planning',
