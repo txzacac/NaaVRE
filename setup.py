@@ -27,6 +27,10 @@ setup_args = dict(
     data_files=[('etc/jupyter/jupyter_server_config.d', glob(jupyter_config_path)),
                 ('share/jupyter/lab/extensions', glob(frontend_packages_path))],
     install_requires=[
+        "psycopg2-binary>=2.9.0",
+        "sqlalchemy>=1.4.0",
+        "alembic>=1.8.0",
+        "tinydb>=4.7.0",
     ],
     zip_safe=False,
     include_package_data=True,
