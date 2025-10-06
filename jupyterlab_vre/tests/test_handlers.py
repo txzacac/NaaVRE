@@ -21,7 +21,7 @@ from jupyterlab_vre import ExtractorHandler, TypesHandler, CellsHandler, ExportW
 from jupyterlab_vre.component_containerizer.handlers import wait_for_job, git_hash
 from jupyterlab_vre.database.catalog import Catalog
 from jupyterlab_vre.database.cell import Cell
-from jupyterlab_vre.handlers import load_module_names_mapping
+from jupyterlab_vre.handlers import load_module_names_mapping, SprintHandler, TaskBoardHandler
 from jupyterlab_vre.notebook_search.handlers import NotebookDownloadHandler
 
 if os.path.exists('resources'):
@@ -113,6 +113,10 @@ class HandlersAPITest(AsyncHTTPTestCase):
                                 ('/notebooksearch', NotebookSearchHandler),
                                 ('/notebooksearchratinghandler', NotebookSearchRatingHandler),
                                 ('/notebookdownloadhandler', NotebookDownloadHandler),
+                                ('/collab-manager/api/sprints/(.*)/(.*)', SprintHandler),
+                                ('/collab-manager/api/sprints/(.*)', SprintHandler),
+                                ('/collab-manager/api/tasks/(.*)/(.*)', TaskBoardHandler),
+                                ('/collab-manager/api/tasks/(.*)', TaskBoardHandler),
                                 ],
                                cookie_secret='asdfasdf')
         return self.app
@@ -127,6 +131,109 @@ class HandlersAPITest(AsyncHTTPTestCase):
             response = self.fetch('/notebooksearch', method='POST', body=json.dumps(payload))
             json_response = json.loads(response.body.decode('utf-8'))
             self.assertIsNotNone(json_response)
+
+    def test_sprint_and_task_flow(self):
+        project_id = 'proj_test'
+        # Create sprint
+        payload = {
+            'action': 'create',
+            'name': 'Sprint 1',
+            'goal': 'Initial delivery',
+            'status': 'planned'
+        }
+        response = self.fetch(f'/collab-manager/api/sprints/{project_id}', method='POST', body=json.dumps(payload))
+        self.assertEqual(response.code, 200)
+        sprint_resp = json.loads(response.body.decode('utf-8'))
+        self.assertTrue(sprint_resp['success'])
+        sprint_id = sprint_resp['sprint']['id']
+
+        # Activate sprint
+        payload = {'action': 'update', 'status': 'active'}
+        response = self.fetch(f'/collab-manager/api/sprints/{project_id}/{sprint_id}', method='POST', body=json.dumps(payload))
+        self.assertEqual(response.code, 200)
+
+        # Create a task in sprint
+        task_payload = {
+            'title': 'Task A',
+            'description': 'Do A',
+            'status': 'todo',
+            'priority': 'medium',
+            'tags': [],
+            'assignee': 'u1',
+            'sprintId': sprint_id
+        }
+        response = self.fetch(f'/collab-manager/api/tasks/{project_id}', method='POST', body=json.dumps(task_payload))
+        self.assertEqual(response.code, 200)
+        task_resp = json.loads(response.body.decode('utf-8'))
+        self.assertTrue(task_resp['success'])
+        task_id = task_resp['task']['id']
+
+        # Move task via update
+        response = self.fetch(f'/collab-manager/api/tasks/{project_id}/{task_id}', method='POST', body=json.dumps({'action': 'update', 'status': 'in-progress'}))
+        self.assertEqual(response.code, 200)
+
+        # Get tasks filtered by sprint
+        response = self.fetch(f'/collab-manager/api/tasks/{project_id}?sprintId={sprint_id}', method='GET')
+        self.assertEqual(response.code, 200)
+        board = json.loads(response.body.decode('utf-8'))
+        self.assertTrue(board['success'])
+
+        # Test backlog filtering
+        response = self.fetch(f'/collab-manager/api/tasks/{project_id}?sprintId=backlog', method='GET')
+        self.assertEqual(response.code, 200)
+        board = json.loads(response.body.decode('utf-8'))
+        self.assertTrue(board['success'])
+
+        # Test sprint completion with report generation
+        payload = {'action': 'complete'}
+        response = self.fetch(f'/collab-manager/api/sprints/{project_id}/{sprint_id}', method='POST', body=json.dumps(payload))
+        self.assertEqual(response.code, 200)
+        complete_resp = json.loads(response.body.decode('utf-8'))
+        self.assertTrue(complete_resp['success'])
+        self.assertEqual(complete_resp['sprint']['status'], 'completed')
+        self.assertIn('report', complete_resp)
+        self.assertIn('completionRate', complete_resp['report'])
+
+    def test_sprint_progress_tracking(self):
+        """Test Sprint progress calculation and statistics"""
+        project_id = 'proj_test_progress'
+        
+        # Create sprint
+        payload = {
+            'action': 'create',
+            'name': 'Progress Sprint',
+            'goal': 'Test progress tracking',
+            'status': 'planned'
+        }
+        response = self.fetch(f'/collab-manager/api/sprints/{project_id}', method='POST', body=json.dumps(payload))
+        self.assertEqual(response.code, 200)
+        sprint_resp = json.loads(response.body.decode('utf-8'))
+        sprint_id = sprint_resp['sprint']['id']
+
+        # Create tasks with different statuses
+        tasks = [
+            {'title': 'Task 1', 'status': 'todo', 'sprintId': sprint_id},
+            {'title': 'Task 2', 'status': 'in-progress', 'sprintId': sprint_id},
+            {'title': 'Task 3', 'status': 'done', 'sprintId': sprint_id},
+            {'title': 'Task 4', 'status': 'done', 'sprintId': sprint_id}
+        ]
+        
+        for task in tasks:
+            response = self.fetch(f'/collab-manager/api/tasks/{project_id}', method='POST', body=json.dumps(task))
+            self.assertEqual(response.code, 200)
+
+        # Get sprint with progress statistics
+        response = self.fetch(f'/collab-manager/api/sprints/{project_id}/{sprint_id}', method='GET')
+        self.assertEqual(response.code, 200)
+        sprint_data = json.loads(response.body.decode('utf-8'))
+        self.assertTrue(sprint_data['success'])
+        self.assertIn('progress', sprint_data['sprint'])
+        progress = sprint_data['sprint']['progress']
+        self.assertEqual(progress['totalTasks'], 4)
+        self.assertEqual(progress['completedTasks'], 2)
+        self.assertEqual(progress['inProgressTasks'], 1)
+        self.assertEqual(progress['todoTasks'], 1)
+        self.assertEqual(progress['completionPercentage'], 50.0)
 
     def test_search_rating_handler(self):
         with mock.patch.object(NotebookSearchRatingHandler, 'get_secure_cookie') as m:

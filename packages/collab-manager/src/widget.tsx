@@ -9,9 +9,10 @@ import { ProjectWizard } from './ProjectWizard';
 import { JoinProject } from './JoinProject';
 import { ProjectWorkspace } from './ProjectWorkspace';
 import { TaskBoard } from './TaskBoard';
+import { CrossGroupDashboard } from './CrossGroupDashboard';
 import { ProjectConfig } from './types';
 
-type ViewType = 'main' | 'create' | 'join' | 'modify' | 'workspace' | 'taskboard';
+type ViewType = 'main' | 'create' | 'join' | 'modify' | 'workspace' | 'taskboard' | 'crossgroupdashboard';
 
 export class CollabManagerWidget extends Widget {
   private currentView: ViewType = 'main';
@@ -86,6 +87,16 @@ export class CollabManagerWidget extends Widget {
           content = React.createElement('div', { style: { padding: '20px' } }, 'No project selected');
         }
         break;
+      case 'crossgroupdashboard':
+        if (this.currentProject) {
+          content = React.createElement(CrossGroupDashboard, {
+            projectId: this.currentProject.id,
+            onBack: () => this.showWorkspace(this.currentProject!)
+          });
+        } else {
+          content = React.createElement('div', { style: { padding: '20px' } }, 'No project selected');
+        }
+        break;
       default:
         content = React.createElement('div', { style: { padding: '20px' } }, 'Unknown view');
     }
@@ -125,6 +136,12 @@ export class CollabManagerWidget extends Widget {
 
   private showTaskBoard(project: ProjectConfig) {
     this.currentView = 'taskboard';
+    this.currentProject = project;
+    this.render();
+  }
+
+  private showCrossGroupDashboard(project: ProjectConfig) {
+    this.currentView = 'crossgroupdashboard';
     this.currentProject = project;
     this.render();
   }
@@ -258,8 +275,12 @@ export class CollabManagerWidget extends Widget {
         alert('This feature is coming soon!');
         break;
       case 'sprint':
-        // Sprint management - can open experiment manager
-        alert('This feature is coming soon!');
+        // Sprint management - open Task Board with Sprint functionality
+        if (this.currentProject) {
+          this.showTaskBoard(this.currentProject);
+        } else {
+          alert('No project selected. Please create or join a project first.');
+        }
         break;
       case 'liveProgress':
         // Live progress - can open experiment manager
@@ -274,8 +295,12 @@ export class CollabManagerWidget extends Widget {
         alert('This feature is coming soon!');
         break;
       case 'crossGroupDash':
-        // Cross-group dashboard - can open experiment manager
-        alert('This feature is coming soon!');
+        // Cross-group dashboard - open Cross-group Dashboard
+        if (this.currentProject) {
+          this.showCrossGroupDashboard(this.currentProject);
+        } else {
+          alert('No project selected. Please create or join a project first.');
+        }
         break;
       case 'integrationSchedule':
         // Integration schedule - can open experiment manager

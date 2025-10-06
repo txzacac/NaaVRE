@@ -37,6 +37,9 @@ export interface Task {
   updatedAt: string;
   tags: string[];
   projectId: string;
+  sprintId?: string; // 绑定到 Sprint，空值表示在 Backlog
+  group?: string; // 团队分组，如 "Team A", "Team B"
+  dependsOn?: string[]; // 依赖的任务ID列表
   attachments?: TaskAttachment[];
   links?: TaskLink[];
 }
@@ -76,6 +79,104 @@ export interface TaskBoardData {
   columns: TaskColumn[];
   lastUpdated: string;
 }
+
+// Sprint Planning 相关类型
+export type SprintStatus = 'planned' | 'active' | 'completed' | 'cancelled';
+
+export interface Sprint {
+  id: string;
+  projectId: string;
+  name: string;
+  goal?: string;
+  startDate?: string;
+  endDate?: string;
+  status: SprintStatus;
+  createdAt: string;
+  updatedAt: string;
+  progress?: SprintProgress;
+}
+
+export interface SprintProgress {
+  totalTasks: number;
+  completedTasks: number;
+  inProgressTasks: number;
+  todoTasks: number;
+  completionPercentage: number;
+}
+
+export interface SprintReport {
+  sprintId: string;
+  sprintName: string;
+  goal: string;
+  totalTasks: number;
+  completedTasks: number;
+  incompleteTasks: number;
+  completionRate: number;
+  incompleteTaskList: Task[];
+  completedAt: string;
+}
+
+// Cross-group Dashboard 相关类型
+export interface GroupSummary {
+  group: string;
+  totalTasks: number;
+  completedTasks: number;
+  inProgressTasks: number;
+  todoTasks: number;
+  overdueTasks: number;
+  completionPercentage: number;
+  averageCycleTime: number; // 平均完成周期（天）
+  wipCount: number; // 在制品数量
+  dueIn7Days: number; // 未来7天到期任务数
+}
+
+export interface DashboardKPIs {
+  totalTasks: number;
+  totalCompletionRate: number;
+  overdueTasks: number;
+  dueIn7Days: number;
+  averageWIP: number;
+  averageCycleTime: number;
+}
+
+export interface CrossGroupDependency {
+  id: string;
+  fromGroup: string;
+  toGroup: string;
+  fromTask: string;
+  toTask: string;
+  status: 'blocked' | 'at_risk' | 'on_track';
+  daysLate?: number;
+  dueInDays?: number;
+}
+
+export interface CompareMetrics {
+  groups: string[];
+  metrics: string[];
+  data: {
+    [group: string]: {
+      [metric: string]: number;
+    };
+  };
+}
+
+export interface DashboardFilters {
+  sprint?: string;
+  status?: string[];
+  assignee?: string[];
+  labels?: string[];
+  groups?: string[];
+}
+
+export interface DashboardState {
+  projectId: string;
+  sprint?: string | 'All';
+  filters: DashboardFilters;
+  viewMode: 'overview' | 'compare';
+  compareGroups: string[];
+  compareMetrics: string[];
+}
+
 
 export const PHASES: Phase[] = [
   {

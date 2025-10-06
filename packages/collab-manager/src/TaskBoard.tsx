@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Task, TaskStatus, TaskPriority, TaskColumn, TaskBoardData } from './types';
+import { Task, TaskStatus, TaskPriority, TaskColumn, TaskBoardData, Sprint } from './types';
+import { SprintManager } from './SprintManager';
 
 interface TaskBoardProps {
   projectId: string;
@@ -25,15 +26,36 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({ projectId, onBack }) => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [loading, setLoading] = useState(true);
+  const [sprints, setSprints] = useState<Sprint[]>([]);
+  const [activeSprintId, setActiveSprintId] = useState<string>('');
+  const [showSprintManager, setShowSprintManager] = useState(false);
+  const [viewMode, setViewMode] = useState<'all' | 'backlog' | 'sprint'>('all');
 
   // Initialize task board data
   useEffect(() => {
-    loadTaskBoardData();
+    loadSprints();
   }, [projectId]);
 
-  const loadTaskBoardData = async () => {
+  useEffect(() => {
+    if (viewMode === 'sprint' && activeSprintId) {
+      loadTaskBoardData(activeSprintId);
+    } else if (viewMode === 'backlog') {
+      loadTaskBoardData('backlog');
+    } else {
+      loadTaskBoardData();
+    }
+  }, [projectId, activeSprintId, viewMode]);
+
+  const loadTaskBoardData = async (sprintFilter?: string) => {
     try {
-      const response = await fetch(`/collab-manager/api/tasks/${projectId}`);
+      let qs = '';
+      if (sprintFilter === 'backlog') {
+        qs = '?sprintId=backlog';
+      } else if (sprintFilter && sprintFilter !== 'backlog') {
+        qs = `?sprintId=${encodeURIComponent(sprintFilter)}`;
+      }
+      
+      const response = await fetch(`/collab-manager/api/tasks/${projectId}${qs}`);
       const result = await response.json();
       
       if (result.success) {
@@ -48,6 +70,20 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({ projectId, onBack }) => {
       initializeEmptyBoard();
     }
     setLoading(false);
+  };
+
+  const loadSprints = async () => {
+    try {
+      const resp = await fetch(`/collab-manager/api/sprints/${projectId}`);
+      const result = await resp.json();
+      if (result.success) {
+        setSprints(result.sprints || []);
+        const current = (result.sprints || []).find((s: Sprint) => s.status === 'active');
+        setActiveSprintId(current?.id || '');
+      }
+    } catch (e) {
+      console.error('Failed to load sprints:', e);
+    }
   };
 
   const initializeEmptyBoard = () => {
@@ -95,7 +131,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({ projectId, onBack }) => {
           'Content-Type': 'application/json',
           'X-XSRFToken': xsrfToken,
         },
-        body: JSON.stringify(taskData)
+        body: JSON.stringify({ ...taskData, sprintId: activeSprintId || taskData.sprintId })
       });
 
       const result = await response.json();
@@ -124,7 +160,8 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({ projectId, onBack }) => {
         },
         body: JSON.stringify({
           action: 'update',
-          ...updates
+          ...updates,
+          sprintId: updates.sprintId !== undefined ? updates.sprintId : activeSprintId
         })
       });
 
@@ -250,33 +287,113 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({ projectId, onBack }) => {
           <h1 style={{ margin: 0, fontSize: '24px', color: '#333' }}>Task Board</h1>
           <p style={{ margin: '5px 0 0 0', color: '#666' }}>Project: {projectId}</p>
         </div>
-        <div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {/* 视图切换器 */}
+          <div>
+            <label style={{ display: 'block', marginBottom: '4px', fontSize: '12px', color: '#666' }}>视图</label>
+            <select
+              value={viewMode}
+              onChange={(e) => setViewMode(e.target.value as 'all' | 'backlog' | 'sprint')}
+              style={{
+                padding: '8px 12px',
+                border: '1px solid #ddd',
+                borderRadius: '4px',
+                fontSize: '14px',
+                minWidth: '120px'
+              }}
+            >
+              <option value="all">所有任务</option>
+              <option value="backlog">待办池</option>
+              <option value="sprint">Sprint 视图</option>
+            </select>
+          </div>
+
+          {/* Sprint 选择器 (仅在 Sprint 视图中显示) */}
+          {viewMode === 'sprint' && (
+            <div>
+              <label style={{ display: 'block', marginBottom: '4px', fontSize: '12px', color: '#666' }}>Sprint</label>
+              <select
+                value={activeSprintId}
+                onChange={(e) => setActiveSprintId(e.target.value)}
+                style={{
+                  padding: '8px 12px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px',
+                  fontSize: '14px',
+                  minWidth: '150px'
+                }}
+              >
+                <option value="">选择 Sprint</option>
+                {sprints.map(sprint => (
+                  <option key={sprint.id} value={sprint.id}>
+                    {sprint.name} ({sprint.status})
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
           <button
-            onClick={() => setShowCreateModal(true)}
+            onClick={() => setShowSprintManager(true)}
             style={{
               padding: '10px 20px',
-              backgroundColor: '#2196f3',
+              backgroundColor: '#28a745',
               color: 'white',
               border: 'none',
               borderRadius: '4px',
               cursor: 'pointer',
-              marginRight: '10px'
+              fontSize: '14px'
             }}
           >
-            + New Task
+            管理 Sprint
           </button>
+
+          <button
+            onClick={() => {
+              // Navigate to Cross-group Dashboard
+              window.location.href = `/collab-manager/dashboard/${projectId}`;
+            }}
+            style={{
+              padding: '10px 20px',
+              backgroundColor: '#17a2b8',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '14px'
+            }}
+          >
+            跨团队仪表盘
+          </button>
+          
+          <button
+            onClick={() => setShowCreateModal(true)}
+            style={{
+              padding: '10px 20px',
+              backgroundColor: '#007bff',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '14px'
+            }}
+          >
+            + 新建任务
+          </button>
+          
           <button
             onClick={onBack}
             style={{
               padding: '10px 20px',
-              backgroundColor: '#666',
+              backgroundColor: '#6c757d',
               color: 'white',
               border: 'none',
               borderRadius: '4px',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              fontSize: '14px'
             }}
           >
-            Back to Project
+            返回项目
           </button>
         </div>
       </div>
@@ -358,6 +475,67 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({ projectId, onBack }) => {
           onCancel={() => setEditingTask(null)}
           projectId={projectId}
         />
+      )}
+
+      {/* Sprint Manager Modal */}
+      {showSprintManager && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '8px',
+            width: '90%',
+            maxWidth: '1200px',
+            maxHeight: '90vh',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            <div style={{
+              padding: '20px',
+              borderBottom: '1px solid #dee2e6',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <h2 style={{ margin: 0, color: '#333' }}>Sprint Management</h2>
+              <button
+                onClick={() => setShowSprintManager(false)}
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: '#6c757d',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}
+              >
+                Close
+              </button>
+            </div>
+            <div style={{ flex: 1, overflow: 'auto' }}>
+              <SprintManager
+                projectId={projectId}
+                onSprintSelect={(sprintId) => {
+                  setActiveSprintId(sprintId || '');
+                  setViewMode(sprintId ? 'sprint' : 'all');
+                  setShowSprintManager(false);
+                }}
+                selectedSprintId={activeSprintId}
+              />
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
@@ -528,8 +706,28 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, onSave, onCancel, projectId
     priority: task?.priority || 'medium' as TaskPriority,
     dueDate: task?.dueDate || '',
     tags: task?.tags.join(', ') || '',
-    links: task?.links?.map(link => `${link.title}|${link.url}|${link.type}`).join('\n') || ''
+    links: task?.links?.map(link => `${link.title}|${link.url}|${link.type}`).join('\n') || '',
+    sprintId: task?.sprintId || '',
+    group: task?.group || '',
+    dependsOn: task?.dependsOn?.join(', ') || ''
   });
+  const [sprints, setSprints] = useState<Sprint[]>([]);
+
+  useEffect(() => {
+    loadSprints();
+  }, [projectId]);
+
+  const loadSprints = async () => {
+    try {
+      const response = await fetch(`/collab-manager/api/sprints/${projectId}`);
+      const data = await response.json();
+      if (data.success) {
+        setSprints(data.sprints || []);
+      }
+    } catch (error) {
+      console.error('Failed to load sprints:', error);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -538,6 +736,7 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, onSave, onCancel, projectId
       ...formData,
       tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
       collaborators: formData.collaborators.split(',').map(collab => collab.trim()).filter(collab => collab),
+      dependsOn: formData.dependsOn.split(',').map(id => id.trim()).filter(id => id),
       links: formData.links.split('\n').map(line => {
         const [title, url, type] = line.split('|');
         return title && url ? { title: title.trim(), url: url.trim(), type: (type?.trim() as any) || 'other' } : null;
@@ -587,6 +786,73 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, onSave, onCancel, projectId
               value={formData.title}
               onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
               required
+              style={{
+                width: '100%',
+                padding: '8px',
+                border: '1px solid #ddd',
+                borderRadius: '4px',
+                fontSize: '14px'
+              }}
+            />
+          </div>
+
+          <div style={{ marginBottom: '16px' }}>
+            <label style={{ display: 'block', marginBottom: '4px', fontWeight: 'bold' }}>
+              Sprint
+            </label>
+            <select
+              value={formData.sprintId}
+              onChange={(e) => setFormData(prev => ({ ...prev, sprintId: e.target.value }))}
+              style={{
+                width: '100%',
+                padding: '8px',
+                border: '1px solid #ddd',
+                borderRadius: '4px',
+                fontSize: '14px'
+              }}
+            >
+              <option value="">No Sprint (Backlog)</option>
+              {sprints.map(sprint => (
+                <option key={sprint.id} value={sprint.id}>
+                  {sprint.name} ({sprint.status})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div style={{ marginBottom: '16px' }}>
+            <label style={{ display: 'block', marginBottom: '4px', fontWeight: 'bold' }}>
+              团队分组
+            </label>
+            <select
+              value={formData.group}
+              onChange={(e) => setFormData(prev => ({ ...prev, group: e.target.value }))}
+              style={{
+                width: '100%',
+                padding: '8px',
+                border: '1px solid #ddd',
+                borderRadius: '4px',
+                fontSize: '14px'
+              }}
+            >
+              <option value="">选择团队</option>
+              <option value="Team A">Team A</option>
+              <option value="Team B">Team B</option>
+              <option value="Team C">Team C</option>
+              <option value="Team D">Team D</option>
+              <option value="Unassigned">未分配</option>
+            </select>
+          </div>
+
+          <div style={{ marginBottom: '16px' }}>
+            <label style={{ display: 'block', marginBottom: '4px', fontWeight: 'bold' }}>
+              依赖任务 (任务ID，用逗号分隔)
+            </label>
+            <input
+              type="text"
+              value={formData.dependsOn}
+              onChange={(e) => setFormData(prev => ({ ...prev, dependsOn: e.target.value }))}
+              placeholder="例如: task-1, task-2"
               style={{
                 width: '100%',
                 padding: '8px',

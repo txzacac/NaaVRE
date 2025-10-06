@@ -28,12 +28,10 @@ export const ProjectWorkspace: React.FC<ProjectWorkspaceProps> = ({ project, onB
     // Note: 'videoMeet' , 'fileShare', 'gitIntegration', 'githubIntegration' are removed because they're now functional
     
     // Workflow Tracking & Task Coordination
-    // Note: 'taskBoard' is removed because it's now functional
+    // Note: 'taskBoard', 'sprint', 'crossGroupDash' are removed because they're now functional
     'workflowMap',
-    'sprint',
     'liveProgress',
     'scopedWorkspaces',
-    'crossGroupDash',
     'integrationSchedule',
     'taskReassign',
     
