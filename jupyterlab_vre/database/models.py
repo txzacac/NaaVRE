@@ -101,3 +101,25 @@ class AuditLog(Base):
     
     # Relationships
     project = relationship("Project")
+
+
+class SharedFile(Base):
+    """Shared file metadata model (project-scoped)"""
+    __tablename__ = "shared_files"
+
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    project_id = Column(String, ForeignKey("projects.id"), nullable=False)
+    filename = Column(String(255), nullable=False)
+    stored_name = Column(String(300), nullable=False)  # sanitized/uuid name on disk
+    storage_path = Column(String(800), nullable=False)  # absolute path on NFS
+    mime_type = Column(String(100))
+    file_size = Column(Integer)
+    owner_id = Column(String(100), nullable=False)
+    description = Column(Text)
+    tags = Column(JSON)  # list of strings
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    project = relationship("Project")

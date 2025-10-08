@@ -9,9 +9,10 @@ import { ProjectWizard } from './ProjectWizard';
 import { JoinProject } from './JoinProject';
 import { ProjectWorkspace } from './ProjectWorkspace';
 import { TaskBoard } from './TaskBoard';
+import { FileSharePanel } from './FileSharePanel';
 import { ProjectConfig } from './types';
 
-type ViewType = 'main' | 'create' | 'join' | 'modify' | 'workspace' | 'taskboard';
+type ViewType = 'main' | 'create' | 'join' | 'modify' | 'workspace' | 'taskboard' | 'files';
 
 export class CollabManagerWidget extends Widget {
   private currentView: ViewType = 'main';
@@ -80,6 +81,18 @@ export class CollabManagerWidget extends Widget {
         if (this.currentProject) {
           content = React.createElement(TaskBoard, {
             projectId: this.currentProject.id,
+            onBack: () => this.showWorkspace(this.currentProject!)
+          });
+        } else {
+          content = React.createElement('div', { style: { padding: '20px' } }, 'No project selected');
+        }
+        break;
+      case 'files':
+        if (this.currentProject) {
+          const baseUrl = this.app?.serviceManager?.serverSettings?.baseUrl || '';
+          content = React.createElement(FileSharePanel, {
+            projectId: this.currentProject.id,
+            baseUrl,
             onBack: () => this.showWorkspace(this.currentProject!)
           });
         } else {
@@ -198,19 +211,12 @@ export class CollabManagerWidget extends Widget {
         alert('Onboarding Docs feature is coming soon!');
         break;
       case 'fileShare':
-        // File sharing - open File Browser widget
-        try {
-          // Try to activate the file browser widget by ID
-          this.app.shell.activateById('filebrowser');
-        } catch (error) {
-          console.error('Failed to open File Browser:', error);
-          // Fallback: try alternative widget IDs
-          try {
-            this.app.shell.activateById('jp-property-inspector');
-          } catch (error2) {
-            console.error('Failed to open File Browser with alternative ID:', error2);
-            alert('File Browser feature is not available. Please check if the extension is properly installed.');
-          }
+        // File sharing - open File Share panel
+        if (this.currentProject) {
+          this.currentView = 'files';
+          this.render();
+        } else {
+          alert('No project selected. Please create or join a project first.');
         }
         break;
       case 'gitIntegration':

@@ -5,7 +5,7 @@ from typing import List, Optional, Dict, Any
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_, desc, asc
 from datetime import datetime, timedelta
-from .models import Project, Task, Sprint, UserSession, AuditLog
+from .models import Project, Task, Sprint, UserSession, AuditLog, SharedFile
 
 class ProjectDAO:
     """Project Data Access Object"""
@@ -232,3 +232,47 @@ class AuditLogDAO:
         return self.db.query(AuditLog).filter(
             AuditLog.project_id == project_id
         ).order_by(desc(AuditLog.timestamp)).limit(limit).all()
+
+
+class FileDAO:
+    """Shared File Data Access Object"""
+    
+    def __init__(self, db: Session):
+        self.db = db
+    
+    def list_by_project(self, project_id: str) -> List[SharedFile]:
+        return (
+            self.db.query(SharedFile)
+            .filter(SharedFile.project_id == project_id, SharedFile.is_active == True)
+            .order_by(desc(SharedFile.updated_at))
+            .all()
+        )
+    
+    def get_by_id(self, file_id: str) -> Optional[SharedFile]:
+        return self.db.query(SharedFile).filter(SharedFile.id == file_id).first()
+    
+    def create(self, data: Dict[str, Any]) -> SharedFile:
+        record = SharedFile(**data)
+        self.db.add(record)
+        self.db.commit()
+        self.db.refresh(record)
+        return record
+    
+    def update(self, file_id: str, update_data: Dict[str, Any]) -> Optional[SharedFile]:
+        rec = self.get_by_id(file_id)
+        if rec:
+            for k, v in update_data.items():
+                setattr(rec, k, v)
+            rec.updated_at = datetime.utcnow()
+            self.db.commit()
+            self.db.refresh(rec)
+        return rec
+    
+    def soft_delete(self, file_id: str) -> bool:
+        rec = self.get_by_id(file_id)
+        if rec:
+            rec.is_active = False
+            rec.updated_at = datetime.utcnow()
+            self.db.commit()
+            return True
+        return False

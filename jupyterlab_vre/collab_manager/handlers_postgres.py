@@ -8,7 +8,10 @@ from tornado import web
 from notebook.base.handlers import APIHandler
 from sqlalchemy.orm import Session
 from jupyterlab_vre.database.config import SessionLocal, init_db
-from jupyterlab_vre.database.dao import ProjectDAO, TaskDAO, SprintDAO, UserSessionDAO, AuditLogDAO
+from jupyterlab_vre.database.dao import ProjectDAO, TaskDAO, SprintDAO, UserSessionDAO, AuditLogDAO, FileDAO
+import os
+import re
+from uuid import uuid4
 
 class CollabManagerHandler(APIHandler):
     def set_default_headers(self):
@@ -1214,3 +1217,252 @@ class CrossGroupDashboardHandler(APIHandler):
                             dependencies.append(dependency)
         
         return dependencies
+
+
+class FileShareHandler(APIHandler):
+    """File sharing handler with project-scoped NFS storage.
+
+    Endpoints:
+    - GET /collab-manager/api/files/<project_id>                      -> list files
+    - POST /collab-manager/api/files/<project_id>                     -> action=create|update|delete
+    - GET /collab-manager/api/files/<project_id>/<file_id>/download   -> download file
+    """
+
+    def set_default_headers(self):
+        self.set_header("Access-Control-Allow-Origin", "*")
+        self.set_header("Access-Control-Allow-Headers", "x-requested-with, content-type")
+        self.set_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+
+    def options(self, *args, **kwargs):
+        self.finish()
+
+    def prepare(self):
+        super().prepare()
+        self._xsrf_token = None
+
+    def check_xsrf_cookie(self):
+        return True
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        init_db()
+        self.db = SessionLocal()
+        self.file_dao = FileDAO(self.db)
+        self.project_dao = ProjectDAO(self.db)
+        self.audit_dao = AuditLogDAO(self.db)
+        # NFS root path
+        self.nfs_root = os.getenv('NAAVRE_NFS_ROOT', '/srv/naavre/shared')
+
+    def on_finish(self):
+        try:
+            self.db.close()
+        except Exception:
+            pass
+
+    def _ensure_project_dir(self, project_id: str) -> str:
+        project_dir = os.path.join(self.nfs_root, project_id)
+        os.makedirs(project_dir, exist_ok=True)
+        return project_dir
+
+    def _sanitize_filename(self, name: str) -> str:
+        # keep extension, sanitize base
+        name = os.path.basename(name)
+        base, ext = os.path.splitext(name)
+        safe_base = re.sub(r"[^A-Za-z0-9._-]", "_", base)[:120]
+        return f"{safe_base}{ext}"
+
+    def _user_id(self) -> str:
+        # Placeholder: in production extract from auth
+        return self.get_argument('user', default='unknown')
+
+    def _is_project_member(self, user_id: str, project_id: str) -> bool:
+        # Placeholder: allow if project exists
+        return self.project_dao.get_by_id(project_id) is not None
+
+    def get(self, project_id: str, file_id: str = None, action: str = None):
+        try:
+            user_id = self._user_id()
+            if not self._is_project_member(user_id, project_id):
+                self.set_status(403)
+                self.finish(json.dumps({'success': False, 'error': 'Forbidden'}))
+                return
+
+            # download endpoint
+            if file_id and action == 'download':
+                rec = self.file_dao.get_by_id(file_id)
+                if not rec or rec.project_id != project_id or not rec.is_active:
+                    self.set_status(404)
+                    self.finish(json.dumps({'success': False, 'error': 'File not found'}))
+                    return
+                if not os.path.exists(rec.storage_path):
+                    self.set_status(410)
+                    self.finish(json.dumps({'success': False, 'error': 'File missing on storage'}))
+                    return
+                self.set_header('Content-Type', rec.mime_type or 'application/octet-stream')
+                self.set_header('Content-Disposition', f"attachment; filename=\"{rec.filename}\"")
+                with open(rec.storage_path, 'rb') as f:
+                    self.write(f.read())
+                return
+
+            # list files
+            files = self.file_dao.list_by_project(project_id)
+            items = []
+            for f in files:
+                items.append({
+                    'id': f.id,
+                    'filename': f.filename,
+                    'mimeType': f.mime_type,
+                    'fileSize': f.file_size,
+                    'ownerId': f.owner_id,
+                    'description': f.description or '',
+                    'tags': f.tags or [],
+                    'createdAt': f.created_at.isoformat(),
+                    'updatedAt': f.updated_at.isoformat()
+                })
+            self.finish(json.dumps({'success': True, 'files': items}))
+        except Exception as e:
+            self.set_status(500)
+            self.finish(json.dumps({'success': False, 'error': str(e)}))
+
+    def post(self, project_id: str):
+        try:
+            user_id = self._user_id()
+            if not self._is_project_member(user_id, project_id):
+                self.set_status(403)
+                self.finish(json.dumps({'success': False, 'error': 'Forbidden'}))
+                return
+
+            # Decide multipart or JSON
+            content_type = self.request.headers.get('Content-Type', '')
+            action = None
+            data = {}
+            
+            if content_type.startswith('application/json'):
+                # JSON request - parse body for action
+                try:
+                    data = json.loads(self.request.body.decode('utf-8') or '{}')
+                except Exception:
+                    data = {}
+                action = data.get('action', 'update')
+            else:
+                # Form request - check for file upload
+                action = self.get_argument('action', default='create')
+
+            if action == 'create':
+                # upload
+                project_dir = self._ensure_project_dir(project_id)
+                if not self.request.files:
+                    self.set_status(400)
+                    self.finish(json.dumps({'success': False, 'error': 'No file uploaded'}))
+                    return
+                # take first file field
+                file_field = list(self.request.files.keys())[0]
+                fileinfo = self.request.files[file_field][0]
+                original_name = self._sanitize_filename(fileinfo.get('filename', 'file'))
+                content_type = fileinfo.get('content_type', 'application/octet-stream')
+                body = fileinfo.get('body', b'')
+                file_size = len(body)
+                # stored name
+                _, ext = os.path.splitext(original_name)
+                stored_name = f"{uuid4().hex}{ext}"
+                storage_path = os.path.join(project_dir, stored_name)
+                with open(storage_path, 'wb') as f:
+                    f.write(body)
+                # metadata
+                description = self.get_argument('description', default='')
+                tags_raw = self.get_argument('tags', default='')
+                tags = []
+                if tags_raw:
+                    try:
+                        tags = json.loads(tags_raw) if tags_raw.startswith('[') else [t.strip() for t in tags_raw.split(',') if t.strip()]
+                    except Exception:
+                        tags = []
+                rec = self.file_dao.create({
+                    'project_id': project_id,
+                    'filename': original_name,
+                    'stored_name': stored_name,
+                    'storage_path': storage_path,
+                    'mime_type': content_type,
+                    'file_size': file_size,
+                    'owner_id': user_id,
+                    'description': description,
+                    'tags': tags
+                })
+                try:
+                    self.audit_dao.log_action(user_id, project_id, 'upload', 'file', rec.id, None, {'filename': original_name})
+                except Exception:
+                    pass
+                self.finish(json.dumps({'success': True, 'file': {
+                    'id': rec.id,
+                    'filename': rec.filename,
+                    'mimeType': rec.mime_type,
+                    'fileSize': rec.file_size,
+                    'ownerId': rec.owner_id,
+                    'description': rec.description or '',
+                    'tags': rec.tags or [],
+                    'createdAt': rec.created_at.isoformat(),
+                    'updatedAt': rec.updated_at.isoformat()
+                }}))
+                return
+
+            if action == 'update':
+                file_id = data.get('id')
+                if not file_id:
+                    self.set_status(400)
+                    self.finish(json.dumps({'success': False, 'error': 'id required'}))
+                    return
+                rec = self.file_dao.get_by_id(file_id)
+                if not rec or rec.project_id != project_id:
+                    self.set_status(404)
+                    self.finish(json.dumps({'success': False, 'error': 'File not found'}))
+                    return
+                # MVP: allow any project member to update metadata
+                update_data = {}
+                if 'description' in data:
+                    update_data['description'] = data.get('description')
+                if 'tags' in data:
+                    update_data['tags'] = data.get('tags') if isinstance(data.get('tags'), list) else []
+                old_values = {'description': rec.description, 'tags': rec.tags}
+                rec = self.file_dao.update(file_id, update_data)
+                try:
+                    self.audit_dao.log_action(user_id, project_id, 'update', 'file', file_id, old_values, update_data)
+                except Exception:
+                    pass
+                self.finish(json.dumps({'success': True, 'file': {
+                    'id': rec.id,
+                    'filename': rec.filename,
+                    'mimeType': rec.mime_type,
+                    'fileSize': rec.file_size,
+                    'ownerId': rec.owner_id,
+                    'description': rec.description or '',
+                    'tags': rec.tags or [],
+                    'createdAt': rec.created_at.isoformat(),
+                    'updatedAt': rec.updated_at.isoformat()
+                }}))
+                return
+
+            if action == 'delete':
+                file_id = data.get('id')
+                if not file_id:
+                    self.set_status(400)
+                    self.finish(json.dumps({'success': False, 'error': 'id required'}))
+                    return
+                rec = self.file_dao.get_by_id(file_id)
+                if not rec or rec.project_id != project_id:
+                    self.set_status(404)
+                    self.finish(json.dumps({'success': False, 'error': 'File not found'}))
+                    return
+                # MVP: allow any project member to delete
+                self.file_dao.soft_delete(file_id)
+                try:
+                    self.audit_dao.log_action(user_id, project_id, 'delete', 'file', file_id, {'filename': rec.filename}, None)
+                except Exception:
+                    pass
+                self.finish(json.dumps({'success': True}))
+                return
+
+            self.set_status(400)
+            self.finish(json.dumps({'success': False, 'error': 'Invalid action'}))
+        except Exception as e:
+            self.set_status(500)
+            self.finish(json.dumps({'success': False, 'error': str(e)}))
